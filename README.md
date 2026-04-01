@@ -14,6 +14,24 @@ For each transcript in `~/Documents/art-talks/*.txt`, the pipeline creates:
 
 The captions share a common voice agent and then adapt to each platform's style rules.
 
+## High-Level Design
+
+The pipeline is intentionally split into configuration and execution:
+
+- Agent definitions live in `config/agents/*.yaml` and are loaded at runtime.
+- Task definitions live in `config/tasks/*.yaml` and define prompt templates and expected outputs.
+- The runtime (in `scripts/captions_pipeline.py`) wires agents + tasks together using CrewAI.
+
+For each transcript, the execution flow is:
+
+1. Load the transcript text and optional extra context.
+2. Run the voice task to extract voice guidance.
+3. Run the personality task to extract personality markers.
+4. Run the tags task to generate reusable tags.
+5. Run each platform task to produce a caption, using the voice, personality, and tags outputs as context.
+
+Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt`.
+
 ## Prerequisites
 
 1. Install and run Ollama.
