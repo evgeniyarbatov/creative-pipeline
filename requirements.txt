@@ -1,0 +1,5 @@
+crewai
+langchain-community
+langchain-ollama
+pytest
+pyyaml
