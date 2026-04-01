@@ -11,7 +11,7 @@ install: venv
 	$(PIP) install -r requirements.txt
 
 run-captions:
-	$(PYTHON) captions_pipeline.py
+	$(PYTHON) scripts/captions_pipeline.py
 
 test: install
 	$(PYTHON) -m pytest -q

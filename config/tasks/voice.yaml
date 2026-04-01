@@ -1,0 +1,11 @@
+description_template: |
+  Analyze the transcript and produce a concise voice guide. Include tone,
+  sentence rhythm, favorite phrases, and do/don't rules. Also summarize the
+  artwork in 2 sentences using the artist's language.
+
+  Transcript:
+  {transcript}
+
+  Additional context:
+  {context}
+expected_output: "Voice guide with 5 to 8 bullet points, plus a 2-sentence artwork summary."

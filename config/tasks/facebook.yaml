@@ -1,0 +1,17 @@
+display_name: "Facebook"
+style_rules: "Friendly and conversational. 1 to 2 short paragraphs. Light storytelling about the piece and process. End with a gentle question or invitation to comment."
+output_rules: "No more than 800 characters. Avoid more than 2 hashtags."
+description_template: |
+  Write a {display_name} caption for the artwork in the artist's voice.
+  Style rules: {style_rules}
+  Output rules: {output_rules}
+
+  Use the voice guide, personality notes, and summary below. Do not include section headers or analysis.
+  Return only the caption text.
+
+  Transcript:
+  {transcript}
+
+  Additional context:
+  {context}
+expected_output: "A {display_name} caption only."

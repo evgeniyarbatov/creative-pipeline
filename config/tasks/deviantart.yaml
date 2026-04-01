@@ -1,0 +1,17 @@
+display_name: "DeviantArt"
+style_rules: "Art-community tone. Mention medium, tools, or process. Share a short insight about intent or experimentation."
+output_rules: "Aim for 500 to 1200 characters. Avoid hashtags unless truly natural."
+description_template: |
+  Write a {display_name} caption for the artwork in the artist's voice.
+  Style rules: {style_rules}
+  Output rules: {output_rules}
+
+  Use the voice guide, personality notes, and summary below. Do not include section headers or analysis.
+  Return only the caption text.
+
+  Transcript:
+  {transcript}
+
+  Additional context:
+  {context}
+expected_output: "A {display_name} caption only."

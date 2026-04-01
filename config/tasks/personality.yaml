@@ -1,0 +1,11 @@
+description_template: |
+  Extract the artist's personality markers from the transcript. Focus on
+  tone, attitude, humor level, pacing, formality, values, and any consistent
+  phrases or quirks that make the writing feel like them.
+
+  Transcript:
+  {transcript}
+
+  Additional context:
+  {context}
+expected_output: "Personality notes with 5 to 8 bullet points and 2 do/don't guidelines."

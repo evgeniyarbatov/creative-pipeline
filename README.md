@@ -40,7 +40,7 @@ make install
 ## Run The Pipeline
 
 ```bash
-python captions_pipeline.py --transcripts-dir ~/Documents/art-talks
+python scripts/captions_pipeline.py --transcripts-dir ~/Documents/art-talks
 ```
 
 Or use the Makefile:
@@ -56,6 +56,7 @@ Optional flags:
 - `--dry-run` (inspect output paths without calling the model)
 - `--ollama-base-url http://localhost:11434`
 - `--agents-dir /path/to/agents` (directory of per-agent YAML configs)
+- `--tasks-dir /path/to/tasks` (directory of per-task YAML configs)
 
 ## Adding Extra Context (Extensible Design)
 
@@ -74,14 +75,15 @@ This is meant for future expansion (image notes, intended audience, links, etc.)
 To add a new platform:
 
 1. Add a new agent YAML file in `config/agents/<platform>.yaml`.
-2. Update `PLATFORM_RULES` in `captions_pipeline.py`.
-3. Pass the new platform name via `--platforms` or add it to `DEFAULT_PLATFORMS` in `pipeline_utils.py`.
+2. Add a new task YAML file in `config/tasks/<platform>.yaml`.
+3. Pass the new platform name via `--platforms` or add it to `DEFAULT_PLATFORMS` in `scripts/pipeline_utils.py`.
 
 ## Agent Configuration
 
 Each agent is configured in its own YAML file under `config/agents/`:
 
 - `config/agents/voice.yaml`
+- `config/agents/personality.yaml`
 - `config/agents/tags.yaml`
 - `config/agents/facebook.yaml`
 - `config/agents/instagram.yaml`
@@ -95,6 +97,26 @@ Each file supports these keys:
 - `backstory`
 - `allow_delegation`
 - `verbose`
+
+## Task Configuration
+
+Each task is configured in its own YAML file under `config/tasks/`:
+
+- `config/tasks/voice.yaml`
+- `config/tasks/personality.yaml`
+- `config/tasks/tags.yaml`
+- `config/tasks/facebook.yaml`
+- `config/tasks/instagram.yaml`
+- `config/tasks/deviantart.yaml`
+- `config/tasks/pinterest.yaml`
+
+Each file supports these keys:
+
+- `description_template`
+- `expected_output`
+- `display_name` (platform tasks only)
+- `style_rules` (platform tasks only)
+- `output_rules` (platform tasks only)
 
 ## Tests
 

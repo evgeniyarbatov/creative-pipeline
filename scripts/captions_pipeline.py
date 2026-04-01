@@ -2,61 +2,14 @@ from __future__ import annotations
 
 import argparse
 import os
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
 from crewai import Agent, Crew, Process, Task
 
 from agent_config import AgentConfigError, load_agent_config
+from task_config import TaskConfigError, load_task_config
 from pipeline_utils import DEFAULT_PLATFORMS, build_output_paths, derive_artwork_name, find_optional_context
-
-
-@dataclass(frozen=True)
-class PlatformRule:
-    display_name: str
-    style_rules: str
-    output_rules: str
-
-
-PLATFORM_RULES: dict[str, PlatformRule] = {
-    "facebook": PlatformRule(
-        display_name="Facebook",
-        style_rules=(
-            "Friendly and conversational. 1 to 2 short paragraphs."
-            " Light storytelling about the piece and process."
-            " End with a gentle question or invitation to comment."
-        ),
-        output_rules="No more than 800 characters. Avoid more than 2 hashtags.",
-    ),
-    "instagram": PlatformRule(
-        display_name="Instagram",
-        style_rules=(
-            "Vivid, visual, and compact. Use line breaks for rhythm."
-            " Focus on mood, materials, and a single memorable detail."
-        ),
-        output_rules=(
-            "Aim for 400 to 900 characters."
-            " Include 3 to 8 hashtags derived from the tag list if relevant."
-        ),
-    ),
-    "deviantart": PlatformRule(
-        display_name="DeviantArt",
-        style_rules=(
-            "Art-community tone. Mention medium, tools, or process."
-            " Share a short insight about intent or experimentation."
-        ),
-        output_rules="Aim for 500 to 1200 characters. Avoid hashtags unless truly natural.",
-    ),
-    "pinterest": PlatformRule(
-        display_name="Pinterest",
-        style_rules=(
-            "Search-friendly and concise. Emphasize subject, style, and use-case."
-            " Keep it skimmable with a clear lead sentence."
-        ),
-        output_rules="Keep it under 500 characters. Include 2 to 4 keywords or hashtags.",
-    ),
-}
 
 
 def get_llm(model_name: str, base_url: str | None):
@@ -79,79 +32,105 @@ def get_llm(model_name: str, base_url: str | None):
         return Ollama(model=model_name, **kwargs)
 
 
-def build_agents(llm, agents_dir: Path) -> dict[str, Agent]:
+def build_agents(llm, agents_dir: Path, platforms: Iterable[str]) -> dict[str, Agent]:
     def build_agent(name: str) -> Agent:
         config = load_agent_config(agents_dir / f"{name}.yaml")
         return Agent(**config, llm=llm)
 
     agents: dict[str, Agent] = {
         "voice": build_agent("voice"),
+        "personality": build_agent("personality"),
         "tags": build_agent("tags"),
     }
 
-    for platform in PLATFORM_RULES:
+    for platform in platforms:
         agents[platform] = build_agent(platform)
 
     return agents
 
 
+def load_task_configs(tasks_dir: Path, platforms: Iterable[str]) -> dict[str, dict[str, str]]:
+    task_configs = {
+        "voice": load_task_config(tasks_dir / "voice.yaml"),
+        "personality": load_task_config(tasks_dir / "personality.yaml"),
+        "tags": load_task_config(tasks_dir / "tags.yaml"),
+    }
+
+    for platform in platforms:
+        task_configs[platform] = load_task_config(tasks_dir / f"{platform}.yaml")
+
+    return task_configs
+
+
 def build_tasks(
     agents: dict[str, Agent],
+    task_configs: dict[str, dict[str, str]],
     transcript_text: str,
     context_text: str | None,
     output_dir: Path,
     platforms: Iterable[str],
 ) -> list[Task]:
+    context_value = context_text or "None provided."
+    voice_config = task_configs["voice"]
     voice_task = Task(
         description=(
-            "Analyze the transcript and produce a concise voice guide."
-            " Include tone, sentence rhythm, favorite phrases, and do/don't rules."
-            " Also summarize the artwork in 2 sentences using the artist's language.\n\n"
-            f"Transcript:\n{transcript_text}\n\n"
-            f"Additional context:\n{context_text or 'None provided.'}"
+            voice_config["description_template"].format(
+                transcript=transcript_text,
+                context=context_value,
+            )
         ),
-        expected_output=(
-            "Voice guide with 5 to 8 bullet points, plus a 2-sentence artwork summary."
-        ),
+        expected_output=voice_config["expected_output"],
         agent=agents["voice"],
     )
 
+    personality_config = task_configs["personality"]
+    personality_task = Task(
+        description=(
+            personality_config["description_template"].format(
+                transcript=transcript_text,
+                context=context_value,
+            )
+        ),
+        expected_output=personality_config["expected_output"],
+        agent=agents["personality"],
+    )
+
     tags_path = output_dir / "tags.txt"
+    tags_config = task_configs["tags"]
     tag_task = Task(
         description=(
-            "Generate a tag list for the artwork."
-            " Focus on subject, medium, style, mood, and themes."
-            " Use short phrases (1 to 3 words). No hashtags. One tag per line.\n\n"
-            f"Transcript:\n{transcript_text}\n\n"
-            f"Additional context:\n{context_text or 'None provided.'}"
+            tags_config["description_template"].format(
+                transcript=transcript_text,
+                context=context_value,
+            )
         ),
-        expected_output="8 to 20 tags, one per line.",
+        expected_output=tags_config["expected_output"],
         agent=agents["tags"],
         output_file=str(tags_path),
     )
 
-    tasks = [voice_task, tag_task]
+    tasks = [voice_task, personality_task, tag_task]
 
     for platform in platforms:
-        rule = PLATFORM_RULES[platform]
+        config = task_configs[platform]
+        display_name = config.get("display_name", platform.title())
+        style_rules = config.get("style_rules", "")
+        output_rules = config.get("output_rules", "")
         output_path = output_dir / f"{platform}.txt"
-        description = (
-            f"Write a {rule.display_name} caption for the artwork in the artist's voice."
-            f" Style rules: {rule.style_rules}"
-            f" Output rules: {rule.output_rules}\n\n"
-            "Use the voice guide and summary below."
-            " Do not include section headers or analysis."
-            " Return only the caption text.\n\n"
-            f"Transcript:\n{transcript_text}\n\n"
-            f"Additional context:\n{context_text or 'None provided.'}"
+        description = config["description_template"].format(
+            display_name=display_name,
+            style_rules=style_rules,
+            output_rules=output_rules,
+            transcript=transcript_text,
+            context=context_value,
         )
 
         tasks.append(
             Task(
                 description=description,
-                expected_output=f"A {rule.display_name} caption only.",
+                expected_output=config["expected_output"].format(display_name=display_name),
                 agent=agents[platform],
-                context=[voice_task, tag_task],
+                context=[voice_task, personality_task, tag_task],
                 output_file=str(output_path),
             )
         )
@@ -165,6 +144,7 @@ def process_transcript(
     platforms: Iterable[str],
     llm,
     agents_dir: Path,
+    task_configs: dict[str, dict[str, str]],
     dry_run: bool,
 ) -> None:
     transcript_text = transcript_path.read_text(encoding="utf-8").strip()
@@ -188,8 +168,8 @@ def process_transcript(
         print(f"  - tags: {output_dir / 'tags.txt'}")
         return
 
-    agents = build_agents(llm, agents_dir)
-    tasks = build_tasks(agents, transcript_text, context_text, output_dir, platforms)
+    agents = build_agents(llm, agents_dir, platforms)
+    tasks = build_tasks(agents, task_configs, transcript_text, context_text, output_dir, platforms)
 
     crew = Crew(
         agents=list(agents.values()),
@@ -234,8 +214,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--agents-dir",
-        default=str(Path(__file__).resolve().parent / "config" / "agents"),
+        default=str(Path(__file__).resolve().parents[1] / "config" / "agents"),
         help="Directory containing per-agent YAML configs.",
+    )
+    parser.add_argument(
+        "--tasks-dir",
+        default=str(Path(__file__).resolve().parents[1] / "config" / "tasks"),
+        help="Directory containing per-task YAML configs.",
     )
     parser.add_argument(
         "--dry-run",
@@ -252,14 +237,18 @@ def main() -> None:
     output_root = Path(args.output_dir).expanduser() if args.output_dir else transcripts_dir
 
     platforms = [platform.lower() for platform in args.platforms]
-    unknown = [p for p in platforms if p not in PLATFORM_RULES]
-    if unknown:
-        raise SystemExit(f"Unknown platforms: {', '.join(unknown)}")
 
     llm = get_llm(args.model, args.ollama_base_url)
     agents_dir = Path(args.agents_dir).expanduser()
     if not agents_dir.exists():
         raise SystemExit(f"Agent config directory not found: {agents_dir}")
+    tasks_dir = Path(args.tasks_dir).expanduser()
+    if not tasks_dir.exists():
+        raise SystemExit(f"Task config directory not found: {tasks_dir}")
+    try:
+        task_configs = load_task_configs(tasks_dir, platforms)
+    except TaskConfigError as exc:
+        raise SystemExit(str(exc)) from exc
 
     transcript_files = sorted(transcripts_dir.glob("*.txt"))
     if not transcript_files:
@@ -274,9 +263,10 @@ def main() -> None:
                 platforms,
                 llm,
                 agents_dir,
+                task_configs,
                 args.dry_run,
             )
-        except AgentConfigError as exc:
+        except (AgentConfigError, TaskConfigError) as exc:
             raise SystemExit(str(exc)) from exc
 
 
