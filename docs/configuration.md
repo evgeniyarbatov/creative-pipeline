@@ -49,6 +49,15 @@ Common options:
 - `--ollama-base-url http://localhost:11434`
 - `--config-dir /path/to/configs`
 
+## Ollama Options
+
+Each Ollama request uses the same default options:
+
+- `temperature: 0.4`
+- `top_p: 0.85`
+- `repeat_penalty: 1.15`
+- `num_predict: 120`
+
 ## Add a New Platform
 
 1. Add `agents/<platform>.yaml` with both `agent` and `task` sections.

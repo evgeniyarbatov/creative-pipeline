@@ -19,6 +19,12 @@ from pipeline_utils import (
 
 TRANSCRIPT_ANALYSIS_FILENAME = "transcript_analysis.json"
 TAGS_FILENAME = "tags.txt"
+OLLAMA_OPTIONS = {
+    "temperature": 0.4,
+    "top_p": 0.85,
+    "repeat_penalty": 1.15,
+    "num_predict": 120,
+}
 
 
 def transcript_analysis_path(output_dir: Path) -> Path:
@@ -27,6 +33,10 @@ def transcript_analysis_path(output_dir: Path) -> Path:
 
 def tags_output_path(output_dir: Path) -> Path:
     return output_dir / TAGS_FILENAME
+
+
+def ollama_options() -> dict[str, float | int]:
+    return dict(OLLAMA_OPTIONS)
 
 
 def output_text_ready(path: Path) -> bool:
@@ -79,10 +89,11 @@ def persist_task_output(task: Task, output_path: Path, label: str) -> None:
 
 
 def get_llm(model_name: str, base_url: str | None):
+    options = ollama_options()
     try:
         from crewai import LLM
 
-        kwargs = {}
+        kwargs = {"options": options}
         if base_url:
             kwargs["base_url"] = base_url
         return LLM(model=f"ollama/{model_name}", **kwargs)
@@ -92,7 +103,7 @@ def get_llm(model_name: str, base_url: str | None):
         except Exception:  # pragma: no cover - fallback when community package missing
             from langchain_ollama import Ollama
 
-        kwargs = {}
+        kwargs = {"options": options}
         if base_url:
             kwargs["base_url"] = base_url
         return Ollama(model=model_name, **kwargs)
