@@ -47,7 +47,7 @@ Per transcript, the pipeline creates:
 - `~/Documents/art-talks/<artwork-name>/personality/deviantart.txt`
 - `~/Documents/art-talks/<artwork-name>/personality/pinterest.txt`
 - `~/Documents/art-talks/<artwork-name>/tags.txt`
-- `~/Documents/art-talks/<artwork-name>/transcript_analysis.txt`
+- `~/Documents/art-talks/<artwork-name>/transcript_analysis.json`
 
 ## Data Notes
 

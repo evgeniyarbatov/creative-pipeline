@@ -17,7 +17,7 @@ from pipeline_utils import (
     personality_output_dir,
 )
 
-TRANSCRIPT_ANALYSIS_FILENAME = "transcript_analysis.txt"
+TRANSCRIPT_ANALYSIS_FILENAME = "transcript_analysis.json"
 TAGS_FILENAME = "tags.txt"
 
 

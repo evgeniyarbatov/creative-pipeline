@@ -57,7 +57,7 @@ def test_output_text_ready_false_for_missing_file(tmp_path):
 def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
-    (output_dir / "transcript_analysis.txt").write_text("analysis", encoding="utf-8")
+    (output_dir / "transcript_analysis.json").write_text("analysis", encoding="utf-8")
     (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
     (output_dir / "instagram.txt").write_text("caption", encoding="utf-8")
 
@@ -67,7 +67,7 @@ def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
 def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
-    (output_dir / "transcript_analysis.txt").write_text("analysis", encoding="utf-8")
+    (output_dir / "transcript_analysis.json").write_text("analysis", encoding="utf-8")
     (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
 
     assert outputs_complete(base_output_paths(output_dir, ["instagram"])) is False
