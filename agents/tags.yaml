@@ -12,6 +12,6 @@ task:
     Generate a tag list for the artwork. Focus on subject, medium, style, mood,
     and themes. Use short phrases (1 to 3 words). No hashtags. One tag per line.
 
-    Transcript:
+    Transcript analysis:
     {transcript}
   expected_output: "8 to 20 tags, one per line."

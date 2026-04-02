@@ -4,12 +4,12 @@ from task_config import TaskConfigError, load_task_config
 
 
 def test_load_task_config_defaults(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 agent:
-  role: "Voice"
-  goal: "Capture voice"
+  role: "Transcript"
+  goal: "Capture transcript"
   backstory: "Backstory"
 task:
   description_template: "Do thing with {transcript}"
@@ -25,12 +25,12 @@ task:
 
 
 def test_load_task_config_unknown_key(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 agent:
-  role: "Voice"
-  goal: "Capture voice"
+  role: "Transcript"
+  goal: "Capture transcript"
   backstory: "Backstory"
 task:
   description_template: "Do thing"
@@ -45,12 +45,12 @@ task:
 
 
 def test_load_task_config_missing_required(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 agent:
-  role: "Voice"
-  goal: "Capture voice"
+  role: "Transcript"
+  goal: "Capture transcript"
   backstory: "Backstory"
 task:
   expected_output: "Result"
@@ -63,12 +63,12 @@ task:
 
 
 def test_load_task_config_missing_section(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 agent:
-  role: "Voice"
-  goal: "Capture voice"
+  role: "Transcript"
+  goal: "Capture transcript"
   backstory: "Backstory"
 """.strip(),
         encoding="utf-8",

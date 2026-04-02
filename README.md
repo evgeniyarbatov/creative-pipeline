@@ -11,8 +11,9 @@ For each transcript in `~/Documents/art-talks/*.txt`, the pipeline creates:
 - `~/Documents/art-talks/<artwork-name>/deviantart.txt`
 - `~/Documents/art-talks/<artwork-name>/pinterest.txt`
 - `~/Documents/art-talks/<artwork-name>/tags.txt` (shared tags for all platforms)
+- `~/Documents/art-talks/<artwork-name>/transcript_analysis.txt` (structured extraction used downstream)
 
-The captions share a common voice agent, adapt to each platform's style rules, and then
+The captions share a common transcript analysis agent, adapt to each platform's style rules, and then
 run through a personality styling pass before final output.
 
 ## High-Level Design
@@ -26,12 +27,12 @@ The pipeline is intentionally split into configuration and execution:
 For each transcript, the execution flow is:
 
 1. Load the transcript text.
-2. Run the voice task to extract voice guidance.
+2. Analyze transcript and extract using `agents/transcript.yaml`.
 3. Run the tags task to generate reusable tags.
-4. Run each platform task to produce a base caption using the voice and tags outputs as inputs.
-5. Run the personality styling task to rewrite each platform caption with the creator traits.
+4. Run each platform task to produce a base caption using the analyzed transcript as input.
+5. Run the personality styling task to rewrite each platform caption.
 
-Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt`.
+Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt` and `transcript_analysis.txt`.
 
 ## Prerequisites
 
@@ -45,24 +46,10 @@ ollama pull phi3:mini
 3. Create the virtual environment and install dependencies:
 
 ```bash
-python -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Or use the Makefile (recommended):
-
-```bash
 make install
 ```
 
 ## Run The Pipeline
-
-```bash
-python scripts/captions_pipeline.py --transcripts-dir ~/Documents/art-talks
-```
-
-Or use the Makefile:
 
 ```bash
 make run-captions
@@ -92,7 +79,7 @@ Each config file lives under `agents/` and contains two sections:
 
 Configs included:
 
-- `agents/voice.yaml`
+- `agents/transcript.yaml`
 - `agents/personality.yaml`
 - `agents/tags.yaml`
 - `agents/facebook.yaml`

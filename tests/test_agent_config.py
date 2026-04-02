@@ -4,12 +4,12 @@ from agent_config import AgentConfigError, load_agent_config
 
 
 def test_load_agent_config_defaults(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 agent:
-  role: "Voice"
-  goal: "Capture voice"
+  role: "Transcript"
+  goal: "Capture transcript"
   backstory: "Backstory"
 task:
   description_template: "Do thing with {transcript}"
@@ -25,12 +25,12 @@ task:
 
 
 def test_load_agent_config_unknown_key(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 agent:
-  role: "Voice"
-  goal: "Capture voice"
+  role: "Transcript"
+  goal: "Capture transcript"
   backstory: "Backstory"
   extra: "nope"
 task:
@@ -45,11 +45,11 @@ task:
 
 
 def test_load_agent_config_missing_required(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 agent:
-  role: "Voice"
+  role: "Transcript"
   backstory: "Backstory"
 task:
   description_template: "Do thing"
@@ -63,7 +63,7 @@ task:
 
 
 def test_load_agent_config_missing_section(tmp_path):
-    config_file = tmp_path / "voice.yaml"
+    config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
 task:

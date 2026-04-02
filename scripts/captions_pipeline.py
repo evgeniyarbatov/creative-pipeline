@@ -16,6 +16,26 @@ from pipeline_utils import (
     normalize_personality_outputs,
 )
 
+TRANSCRIPT_ANALYSIS_FILENAME = "transcript_analysis.txt"
+TAGS_FILENAME = "tags.txt"
+
+
+def transcript_analysis_path(output_dir: Path) -> Path:
+    return output_dir / TRANSCRIPT_ANALYSIS_FILENAME
+
+
+def tags_output_path(output_dir: Path) -> Path:
+    return output_dir / TAGS_FILENAME
+
+
+def read_required_text(path: Path, label: str) -> str:
+    if not path.exists():
+        raise TaskConfigError(f"Missing {label} output: {path}")
+    raw = path.read_text(encoding="utf-8").strip()
+    if not raw:
+        raise TaskConfigError(f"Empty {label} output: {path}")
+    return raw
+
 
 def get_llm(model_name: str, base_url: str | None):
     try:
@@ -43,7 +63,7 @@ def build_agents(llm, config_dir: Path, platforms: Iterable[str]) -> dict[str, A
         return Agent(**config, llm=llm)
 
     agents: dict[str, Agent] = {
-        "voice": build_agent("voice"),
+        "transcript": build_agent("transcript"),
         "personality": build_agent("personality"),
         "tags": build_agent("tags"),
     }
@@ -56,7 +76,7 @@ def build_agents(llm, config_dir: Path, platforms: Iterable[str]) -> dict[str, A
 
 def load_task_configs(config_dir: Path, platforms: Iterable[str]) -> dict[str, dict[str, str]]:
     task_configs = {
-        "voice": load_task_config(config_dir / "voice.yaml"),
+        "transcript": load_task_config(config_dir / "transcript.yaml"),
         "personality": load_task_config(config_dir / "personality.yaml"),
         "tags": load_task_config(config_dir / "tags.yaml"),
     }
@@ -67,30 +87,38 @@ def load_task_configs(config_dir: Path, platforms: Iterable[str]) -> dict[str, d
     return task_configs
 
 
-def build_tasks(
+def build_transcript_task(
     agents: dict[str, Agent],
     task_configs: dict[str, dict[str, str]],
     transcript_text: str,
     output_dir: Path,
-    platforms: Iterable[str],
-) -> list[Task]:
-    voice_config = task_configs["voice"]
-    voice_task = Task(
+) -> Task:
+    transcript_config = task_configs["transcript"]
+    output_path = transcript_analysis_path(output_dir)
+    return Task(
         description=(
-            voice_config["description_template"].format(
+            transcript_config["description_template"].format(
                 transcript=transcript_text,
             )
         ),
-        expected_output=voice_config["expected_output"],
-        agent=agents["voice"],
+        expected_output=transcript_config["expected_output"],
+        agent=agents["transcript"],
+        output_file=str(output_path),
     )
 
-    tags_path = output_dir / "tags.txt"
+
+def build_tags_task(
+    agents: dict[str, Agent],
+    task_configs: dict[str, dict[str, str]],
+    transcript_analysis: str,
+    output_dir: Path,
+) -> Task:
     tags_config = task_configs["tags"]
-    tag_task = Task(
+    tags_path = tags_output_path(output_dir)
+    return Task(
         description=(
             tags_config["description_template"].format(
-                transcript=transcript_text,
+                transcript=transcript_analysis,
             )
         ),
         expected_output=tags_config["expected_output"],
@@ -98,8 +126,17 @@ def build_tasks(
         output_file=str(tags_path),
     )
 
-    tasks = [voice_task, tag_task]
 
+
+def build_platform_tasks(
+    agents: dict[str, Agent],
+    task_configs: dict[str, dict[str, str]],
+    transcript_analysis: str,
+    tag_task: Task,
+    output_dir: Path,
+    platforms: Iterable[str],
+) -> list[Task]:
+    tasks: list[Task] = []
     for platform in platforms:
         config = task_configs[platform]
         display_name = config.get("display_name", platform.title())
@@ -110,7 +147,7 @@ def build_tasks(
             display_name=display_name,
             style_rules=style_rules,
             output_rules=output_rules,
-            transcript=transcript_text,
+            transcript=transcript_analysis,
         )
 
         tasks.append(
@@ -118,7 +155,7 @@ def build_tasks(
                 description=description,
                 expected_output=config["expected_output"].format(display_name=display_name),
                 agent=agents[platform],
-                context=[voice_task, tag_task],
+                context=[tag_task],
                 output_file=str(output_path),
             )
         )
@@ -137,11 +174,10 @@ def build_personality_tasks(
 
     for platform in platforms:
         output_path = output_dir / f"{platform}.txt"
-        if not output_path.exists():
-            raise TaskConfigError(f"Missing platform output for personality styling: {output_path}")
-        post_text = output_path.read_text(encoding="utf-8").strip()
-        if not post_text:
-            raise TaskConfigError(f"Empty platform output for personality styling: {output_path}")
+        post_text = read_required_text(
+            output_path,
+            f"{platform} platform output for personality styling",
+        )
 
         display_name = task_configs.get(platform, {}).get("display_name", platform.title())
         description = personality_config["description_template"].format(
@@ -186,22 +222,48 @@ def process_transcript(
         print(f"[Dry run] Would write outputs to {output_dir}")
         for platform, path in output_paths.items():
             print(f"  - {platform}: {path}")
-        print(f"  - tags: {output_dir / 'tags.txt'}")
+        print(f"  - transcript_analysis: {transcript_analysis_path(output_dir)}")
+        print(f"  - tags: {tags_output_path(output_dir)}")
         print("  - personality: would rewrite each platform caption after generation")
         return
 
     agents = build_agents(llm, config_dir, platforms)
-    tasks = build_tasks(agents, task_configs, transcript_text, output_dir, platforms)
-
-    crew = Crew(
-        agents=list(agents.values()),
-        tasks=tasks,
+    # Step 2: analyze transcript into a structured extraction.
+    transcript_task = build_transcript_task(agents, task_configs, transcript_text, output_dir)
+    transcript_crew = Crew(
+        agents=[agents["transcript"]],
+        tasks=[transcript_task],
         process=Process.sequential,
         verbose=True,
     )
+    transcript_crew.kickoff()
 
-    crew.kickoff()
+    transcript_analysis = read_required_text(
+        transcript_analysis_path(output_dir),
+        "transcript analysis",
+    )
 
+    # Step 3 + 4: generate tags, then base captions per platform.
+    tag_task = build_tags_task(agents, task_configs, transcript_analysis, output_dir)
+    platform_tasks = build_platform_tasks(
+        agents,
+        task_configs,
+        transcript_analysis,
+        tag_task,
+        output_dir,
+        platforms,
+    )
+    generation_tasks = [tag_task, *platform_tasks]
+
+    generation_crew = Crew(
+        agents=[agents["tags"], *[agents[platform] for platform in platforms]],
+        tasks=generation_tasks,
+        process=Process.sequential,
+        verbose=True,
+    )
+    generation_crew.kickoff()
+
+    # Step 5: apply personality styling to each platform caption.
     personality_tasks = build_personality_tasks(agents, task_configs, output_dir, platforms)
     personality_crew = Crew(
         agents=[agents["personality"]],
