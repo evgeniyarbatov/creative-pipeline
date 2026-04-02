@@ -11,7 +11,7 @@ DEFAULT_PLATFORMS = ("facebook", "instagram", "deviantart", "pinterest")
 
 def derive_artwork_name(transcript_path: Path) -> str:
     name = transcript_path.stem.strip()
-    if not name:
+    if not name or (transcript_path.name.startswith(".") and transcript_path.suffix == ""):
         raise ValueError(f"Empty artwork name derived from {transcript_path}")
     return name
 

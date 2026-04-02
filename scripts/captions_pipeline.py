@@ -145,6 +145,12 @@ def build_platform_tasks(
             display_name=display_name,
             transcript=transcript_analysis,
         )
+        style_rules = config.get("style_rules")
+        if style_rules:
+            description = f"{description}\n\nStyle rules:\n{style_rules.strip()}"
+        output_rules = config.get("output_rules")
+        if output_rules:
+            description = f"{description}\n\nOutput rules:\n{output_rules.strip()}"
 
         tasks.append(
             Task(
