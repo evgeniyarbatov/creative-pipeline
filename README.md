@@ -1,5 +1,9 @@
 # Creative Pipeline: Social Caption Generator
 
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=llama&logoColor=white)
+![CrewAI](https://img.shields.io/badge/CrewAI-Multi--Agent%20AI-purple)
+
 Generate platform-specific social captions from transcript files using CrewAI + Ollama.
 
 ## Quick Start
