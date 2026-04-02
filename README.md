@@ -12,7 +12,8 @@ For each transcript in `~/Documents/art-talks/*.txt`, the pipeline creates:
 - `~/Documents/art-talks/<artwork-name>/pinterest.txt`
 - `~/Documents/art-talks/<artwork-name>/tags.txt` (shared tags for all platforms)
 
-The captions share a common voice agent and then adapt to each platform's style rules.
+The captions share a common voice agent, adapt to each platform's style rules, and then
+run through a personality styling pass before final output.
 
 ## High-Level Design
 
@@ -26,9 +27,9 @@ For each transcript, the execution flow is:
 
 1. Load the transcript text and optional extra context.
 2. Run the voice task to extract voice guidance.
-3. Run the personality task to extract personality markers.
-4. Run the tags task to generate reusable tags.
-5. Run each platform task to produce a caption, using the voice, personality, and tags outputs as context.
+3. Run the tags task to generate reusable tags.
+4. Run each platform task to produce a base caption using the voice and tags outputs as context.
+5. Run the personality styling task to rewrite each platform caption with the creator traits.
 
 Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt`.
 

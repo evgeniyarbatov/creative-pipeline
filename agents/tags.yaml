@@ -14,7 +14,4 @@ task:
 
     Transcript:
     {transcript}
-
-    Additional context:
-    {context}
   expected_output: "8 to 20 tags, one per line."

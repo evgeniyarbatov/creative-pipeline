@@ -16,12 +16,9 @@ task:
     Style rules: {style_rules}
     Output rules: {output_rules}
 
-    Use the voice guide, personality notes, and summary below. Do not include section headers or analysis.
+    Use the voice guide and summary below. Do not include section headers or analysis.
     Return only the caption text.
 
     Transcript:
     {transcript}
-
-    Additional context:
-    {context}
   expected_output: "A {display_name} caption only."

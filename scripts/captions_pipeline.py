@@ -83,18 +83,6 @@ def build_tasks(
         agent=agents["voice"],
     )
 
-    personality_config = task_configs["personality"]
-    personality_task = Task(
-        description=(
-            personality_config["description_template"].format(
-                transcript=transcript_text,
-                context=context_value,
-            )
-        ),
-        expected_output=personality_config["expected_output"],
-        agent=agents["personality"],
-    )
-
     tags_path = output_dir / "tags.txt"
     tags_config = task_configs["tags"]
     tag_task = Task(
@@ -109,7 +97,7 @@ def build_tasks(
         output_file=str(tags_path),
     )
 
-    tasks = [voice_task, personality_task, tag_task]
+    tasks = [voice_task, tag_task]
 
     for platform in platforms:
         config = task_configs[platform]
@@ -130,7 +118,44 @@ def build_tasks(
                 description=description,
                 expected_output=config["expected_output"].format(display_name=display_name),
                 agent=agents[platform],
-                context=[voice_task, personality_task, tag_task],
+                context=[voice_task, tag_task],
+                output_file=str(output_path),
+            )
+        )
+
+    return tasks
+
+
+def build_personality_tasks(
+    agents: dict[str, Agent],
+    task_configs: dict[str, dict[str, str]],
+    output_dir: Path,
+    platforms: Iterable[str],
+) -> list[Task]:
+    personality_config = task_configs["personality"]
+    tasks: list[Task] = []
+
+    for platform in platforms:
+        output_path = output_dir / f"{platform}.txt"
+        if not output_path.exists():
+            raise TaskConfigError(f"Missing platform output for personality styling: {output_path}")
+        post_text = output_path.read_text(encoding="utf-8").strip()
+        if not post_text:
+            raise TaskConfigError(f"Empty platform output for personality styling: {output_path}")
+
+        display_name = task_configs.get(platform, {}).get("display_name", platform.title())
+        description = personality_config["description_template"].format(
+            post_text=post_text,
+            display_name=display_name,
+            platform=platform,
+        )
+        expected_output = personality_config["expected_output"].format(display_name=display_name)
+
+        tasks.append(
+            Task(
+                description=description,
+                expected_output=expected_output,
+                agent=agents["personality"],
                 output_file=str(output_path),
             )
         )
@@ -166,6 +191,7 @@ def process_transcript(
         for platform, path in output_paths.items():
             print(f"  - {platform}: {path}")
         print(f"  - tags: {output_dir / 'tags.txt'}")
+        print("  - personality: would rewrite each platform caption after generation")
         return
 
     agents = build_agents(llm, config_dir, platforms)
@@ -179,6 +205,15 @@ def process_transcript(
     )
 
     crew.kickoff()
+
+    personality_tasks = build_personality_tasks(agents, task_configs, output_dir, platforms)
+    personality_crew = Crew(
+        agents=[agents["personality"]],
+        tasks=personality_tasks,
+        process=Process.sequential,
+        verbose=True,
+    )
+    personality_crew.kickoff()
 
 
 def main() -> None:
