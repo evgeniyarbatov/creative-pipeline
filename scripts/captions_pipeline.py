@@ -30,6 +30,24 @@ def tags_output_path(output_dir: Path) -> Path:
     return output_dir / TAGS_FILENAME
 
 
+def output_text_ready(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        return bool(path.read_text(encoding="utf-8").strip())
+    except OSError:
+        return False
+
+
+def output_dir_complete(output_dir: Path, platforms: Iterable[str]) -> bool:
+    required_paths = [
+        transcript_analysis_path(output_dir),
+        tags_output_path(output_dir),
+        *[output_dir / f"{platform}.txt" for platform in platforms],
+    ]
+    return all(output_text_ready(path) for path in required_paths)
+
+
 def read_required_text(path: Path, label: str) -> str:
     if not path.exists():
         raise TaskConfigError(f"Missing {label} output: {path}")
@@ -229,6 +247,10 @@ def process_transcript(
     artwork_name = derive_artwork_name(transcript_path)
     output_dir = output_root / artwork_name
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    if not dry_run and output_dir_complete(output_dir, platforms):
+        print(f"Skipping {transcript_path} (outputs already present).")
+        return
 
     if dry_run:
         output_paths = build_output_paths(output_dir, platforms)
