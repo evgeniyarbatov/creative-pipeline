@@ -1,4 +1,4 @@
-# Creative Pipeline: Social Caption Generator
+# Creative Pipeline
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=llama&logoColor=white)
