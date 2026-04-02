@@ -35,6 +35,10 @@ make run-captions
 - Voice Memos transcript steps: `docs/transcripts.md`
 - Configuration and CLI options: `docs/configuration.md`
 
+## Examples
+
+Sample output lives in `examples/`.
+
 ## License
 
 MIT. See `LICENSE.md`.
