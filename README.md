@@ -6,6 +6,10 @@
 
 Generate platform-specific social captions from transcript files using CrewAI + Ollama.
 
+## Examples
+
+See sample output in `examples/`.
+
 ## Quick Start
 
 1. Install and run Ollama.
@@ -38,10 +42,6 @@ make run-captions
 - Getting started and transcripts: `docs/getting-started.md`
 - Voice Memos transcript steps: `docs/transcripts.md`
 - Configuration and CLI options: `docs/configuration.md`
-
-## Examples
-
-Sample output lives in `examples/`.
 
 ## License
 
