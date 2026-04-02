@@ -25,10 +25,10 @@ The pipeline is intentionally split into configuration and execution:
 
 For each transcript, the execution flow is:
 
-1. Load the transcript text and optional extra context.
+1. Load the transcript text.
 2. Run the voice task to extract voice guidance.
 3. Run the tags task to generate reusable tags.
-4. Run each platform task to produce a base caption using the voice and tags outputs as context.
+4. Run each platform task to produce a base caption using the voice and tags outputs as inputs.
 5. Run the personality styling task to rewrite each platform caption with the creator traits.
 
 Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt`.
@@ -76,18 +76,6 @@ Optional flags:
 - `--ollama-base-url http://localhost:11434`
 - `--config-dir /path/to/configs` (directory of per-platform YAML configs)
 
-## Adding Extra Context (Extensible Design)
-
-You can attach extra context per artwork and the pipeline will include it automatically. Place one of these files next to the transcript or inside a `context/` folder:
-
-- `~/Documents/art-talks/<artwork>.context.txt`
-- `~/Documents/art-talks/<artwork>.context.md`
-- `~/Documents/art-talks/context/<artwork>.txt`
-- `~/Documents/art-talks/context/<artwork>.md`
-- `~/Documents/art-talks/context/<artwork>.json`
-
-This is meant for future expansion (image notes, intended audience, links, etc.).
-
 ## Extending Platforms
 
 To add a new platform:
@@ -134,4 +122,4 @@ Configs included:
 make test
 ```
 
-Tests focus on path and context discovery logic so you can change copy rules without breaking IO.
+Tests focus on path and output logic so you can change copy rules without breaking IO.

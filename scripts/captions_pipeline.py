@@ -9,7 +9,13 @@ from crewai import Agent, Crew, Process, Task
 
 from agent_config import AgentConfigError, load_agent_config
 from task_config import TaskConfigError, load_task_config
-from pipeline_utils import DEFAULT_PLATFORMS, build_output_paths, derive_artwork_name, find_optional_context
+from pipeline_utils import (
+    DEFAULT_PLATFORMS,
+    build_output_paths,
+    derive_artwork_name,
+    find_optional_context,
+    normalize_personality_outputs,
+)
 
 
 def get_llm(model_name: str, base_url: str | None):
@@ -66,17 +72,14 @@ def build_tasks(
     agents: dict[str, Agent],
     task_configs: dict[str, dict[str, str]],
     transcript_text: str,
-    context_text: str | None,
     output_dir: Path,
     platforms: Iterable[str],
 ) -> list[Task]:
-    context_value = context_text or "None provided."
     voice_config = task_configs["voice"]
     voice_task = Task(
         description=(
             voice_config["description_template"].format(
                 transcript=transcript_text,
-                context=context_value,
             )
         ),
         expected_output=voice_config["expected_output"],
@@ -89,7 +92,6 @@ def build_tasks(
         description=(
             tags_config["description_template"].format(
                 transcript=transcript_text,
-                context=context_value,
             )
         ),
         expected_output=tags_config["expected_output"],
@@ -110,7 +112,6 @@ def build_tasks(
             style_rules=style_rules,
             output_rules=output_rules,
             transcript=transcript_text,
-            context=context_value,
         )
 
         tasks.append(
@@ -181,10 +182,6 @@ def process_transcript(
     output_dir = output_root / artwork_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    context_text = find_optional_context(transcript_path)
-    if context_text:
-        print(f"Loaded context for {artwork_name}")
-
     if dry_run:
         output_paths = build_output_paths(output_dir, platforms)
         print(f"[Dry run] Would write outputs to {output_dir}")
@@ -195,7 +192,7 @@ def process_transcript(
         return
 
     agents = build_agents(llm, config_dir, platforms)
-    tasks = build_tasks(agents, task_configs, transcript_text, context_text, output_dir, platforms)
+    tasks = build_tasks(agents, task_configs, transcript_text, output_dir, platforms)
 
     crew = Crew(
         agents=list(agents.values()),
@@ -214,6 +211,7 @@ def process_transcript(
         verbose=True,
     )
     personality_crew.kickoff()
+    normalize_personality_outputs(output_dir, platforms)
 
 
 def main() -> None:
