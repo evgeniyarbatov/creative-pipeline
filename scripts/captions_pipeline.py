@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 from crewai import Agent, Crew, Process, Task
 
@@ -35,6 +36,21 @@ def read_required_text(path: Path, label: str) -> str:
     if not raw:
         raise TaskConfigError(f"Empty {label} output: {path}")
     return raw
+
+
+def write_output_file(path: Path, content: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if isinstance(content, dict):
+        payload = json.dumps(content, ensure_ascii=False, indent=2)
+    else:
+        payload = str(content)
+    path.write_text(payload, encoding="utf-8")
+
+
+def persist_task_output(task: Task, output_path: Path, label: str) -> None:
+    if task.output is None:
+        raise TaskConfigError(f"Missing {label} output: {output_path}")
+    write_output_file(output_path, task.output.raw)
 
 
 def get_llm(model_name: str, base_url: str | None):
@@ -94,7 +110,6 @@ def build_transcript_task(
     output_dir: Path,
 ) -> Task:
     transcript_config = task_configs["transcript"]
-    output_path = transcript_analysis_path(output_dir)
     return Task(
         description=(
             transcript_config["description_template"].format(
@@ -103,7 +118,6 @@ def build_transcript_task(
         ),
         expected_output=transcript_config["expected_output"],
         agent=agents["transcript"],
-        output_file=str(output_path),
     )
 
 
@@ -114,7 +128,6 @@ def build_tags_task(
     output_dir: Path,
 ) -> Task:
     tags_config = task_configs["tags"]
-    tags_path = tags_output_path(output_dir)
     return Task(
         description=(
             tags_config["description_template"].format(
@@ -123,7 +136,6 @@ def build_tags_task(
         ),
         expected_output=tags_config["expected_output"],
         agent=agents["tags"],
-        output_file=str(tags_path),
     )
 
 
@@ -158,7 +170,6 @@ def build_platform_tasks(
                 expected_output=config["expected_output"].format(display_name=display_name),
                 agent=agents[platform],
                 context=[tag_task],
-                output_file=str(output_path),
             )
         )
 
@@ -194,7 +205,6 @@ def build_personality_tasks(
                 description=description,
                 expected_output=expected_output,
                 agent=agents["personality"],
-                output_file=str(output_path),
             )
         )
 
@@ -239,6 +249,11 @@ def process_transcript(
         verbose=True,
     )
     transcript_crew.kickoff()
+    persist_task_output(
+        transcript_task,
+        transcript_analysis_path(output_dir),
+        "transcript analysis",
+    )
 
     transcript_analysis = read_required_text(
         transcript_analysis_path(output_dir),
@@ -264,6 +279,17 @@ def process_transcript(
         verbose=True,
     )
     generation_crew.kickoff()
+    persist_task_output(
+        tag_task,
+        tags_output_path(output_dir),
+        "tags",
+    )
+    for platform, task in zip(platforms, platform_tasks, strict=True):
+        persist_task_output(
+            task,
+            output_dir / f"{platform}.txt",
+            f"{platform} caption",
+        )
 
     # Step 5: apply personality styling to each platform caption.
     personality_tasks = build_personality_tasks(agents, task_configs, output_dir, platforms)
@@ -274,6 +300,12 @@ def process_transcript(
         verbose=True,
     )
     personality_crew.kickoff()
+    for platform, task in zip(platforms, personality_tasks, strict=True):
+        persist_task_output(
+            task,
+            output_dir / f"{platform}.txt",
+            f"{platform} personality output",
+        )
     normalize_personality_outputs(output_dir, platforms)
 
 
