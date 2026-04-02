@@ -12,8 +12,6 @@ from agent_config import AgentConfigError, load_agent_config
 from task_config import TaskConfigError, load_task_config
 from pipeline_utils import (
     DEFAULT_PLATFORMS,
-    build_output_paths,
-    build_personality_output_paths,
     derive_artwork_name,
     normalize_tags_output,
     normalize_personality_outputs,
@@ -251,7 +249,6 @@ def process_transcript(
     llm,
     config_dir: Path,
     task_configs: dict[str, dict[str, str]],
-    dry_run: bool,
 ) -> None:
     transcript_text = transcript_path.read_text(encoding="utf-8").strip()
     if not transcript_text:
@@ -265,20 +262,8 @@ def process_transcript(
     base_complete = outputs_complete(base_output_paths(output_dir, platforms))
     personality_complete = outputs_complete(personality_output_paths(output_dir, platforms))
 
-    if not dry_run and base_complete and personality_complete:
+    if base_complete and personality_complete:
         print(f"Skipping {transcript_path} (outputs already present).")
-        return
-
-    if dry_run:
-        output_paths = build_output_paths(output_dir, platforms)
-        personality_paths = build_personality_output_paths(output_dir, platforms)
-        print(f"[Dry run] Would write outputs to {output_dir}")
-        for platform, path in output_paths.items():
-            print(f"  - {platform}: {path}")
-        print(f"  - transcript_analysis: {transcript_analysis_path(output_dir)}")
-        print(f"  - tags: {tags_output_path(output_dir)}")
-        for platform, path in personality_paths.items():
-            print(f"  - personality/{platform}: {path}")
         return
 
     agents = build_agents(llm, config_dir, platforms)
@@ -444,12 +429,6 @@ def main() -> None:
         default=None,
         help="Deprecated alias for --config-dir.",
     )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Show planned outputs without calling the model.",
-    )
-
     args = parser.parse_args()
 
     transcripts_dir = Path(args.transcripts_dir).expanduser()
@@ -487,14 +466,13 @@ def main() -> None:
     for transcript_path in transcript_files:
         try:
             process_transcript(
-                transcript_path,
-                output_root,
-                platforms,
-                llm,
-                configs_dir,
-                task_configs,
-                args.dry_run,
-            )
+            transcript_path,
+            output_root,
+            platforms,
+            llm,
+            configs_dir,
+            task_configs,
+        )
         except (AgentConfigError, TaskConfigError) as exc:
             raise SystemExit(str(exc)) from exc
 

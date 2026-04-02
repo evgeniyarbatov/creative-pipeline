@@ -63,7 +63,6 @@ Optional flags:
 
 - `--platforms facebook instagram` (generate a subset)
 - `--output-dir /path/to/output` (defaults to the transcript dir)
-- `--dry-run` (inspect output paths without calling the model)
 - `--ollama-base-url http://localhost:11434`
 - `--config-dir /path/to/configs` (directory of per-platform YAML configs)
 
