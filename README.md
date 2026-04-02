@@ -1,6 +1,6 @@
 # Creative Pipeline: Social Caption Generator
 
-This pipeline generates platform-specific social captions from your transcript files using CrewAI + Ollama (`phi3:mini`).
+This pipeline generates platform-specific social captions from your transcript files using CrewAI + Ollama (`gemma3:latest`).
 
 ## What It Does
 
@@ -40,7 +40,7 @@ Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file p
 2. Pull the model:
 
 ```bash
-ollama pull phi3:mini
+ollama pull gemma3:latest
 ```
 
 3. Create the virtual environment and install dependencies:

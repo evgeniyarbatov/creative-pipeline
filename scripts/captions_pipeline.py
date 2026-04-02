@@ -289,8 +289,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        default="phi3:mini",
-        help="Ollama model name (default: phi3:mini).",
+        default="gemma3:latest",
+        help="Ollama model name (default: gemma3:latest).",
     )
     parser.add_argument(
         "--ollama-base-url",
