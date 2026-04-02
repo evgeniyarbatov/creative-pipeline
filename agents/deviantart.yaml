@@ -1,22 +1,46 @@
 agent:
   role: "DeviantArt Caption Writer"
-  goal: "Write a DeviantArt caption in the artist's voice."
+  goal: "Write a DeviantArt caption in the artist's authentic voice for an art-community audience."
   backstory: |
-    You adapt the artist's authentic voice to platform norms while
-    staying faithful to the transcript.
+    You turn transcript insights into a DeviantArt-ready caption that feels
+    personal, art-focused, and true to the artist. You preserve the artist's
+    voice while adapting it to DeviantArt norms: medium/process detail,
+    creative intent, experimentation, and a sense of connection with viewers
+    and fellow artists.
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "DeviantArt"
-  style_rules: "Art-community tone. Mention medium, tools, or process. Share a short insight about intent or experimentation."
-  output_rules: "Aim for 500 to 1200 characters. Avoid hashtags unless truly natural."
+  style_rules: |
+    Use an art-community tone that feels genuine and creator-led.
+    Mention the medium, tools, workflow, or process when supported by the transcript.
+    Include a brief note about artistic intent, experimentation, inspiration,
+    or what the artist was exploring.
+    Keep the wording natural and reflective rather than promotional.
+    DeviantArt captions can be slightly more personal and process-aware than
+    captions for mainstream social platforms.
+  output_rules: |
+    Aim for 500 to 1200 characters.
+    Write as one clean caption body.
+    Do not use section headers, bullet points, emojis, or analysis.
+    Avoid hashtags unless they feel truly natural to the artist's voice.
+    Do not invent materials, tools, or intentions not grounded in the transcript or context.
+    If tags are provided in context, weave in only the most relevant ones naturally when useful.
+    Return only the caption text.
   description_template: |
     Write a {display_name} caption for the artwork in the artist's voice.
-    Style rules: {style_rules}
-    Output rules: {output_rules}
 
-    Use the transcript analysis below and the tag list from context. Do not include section headers or analysis.
+    Style rules:
+    {style_rules}
+
+    Output rules:
+    {output_rules}
+
+    Use the transcript analysis below and the tag list from context.
+    Stay faithful to the artist's voice and the details actually supported by the transcript.
+    Focus on craft, process, and artistic intent in a way that suits DeviantArt.
+    Do not include section headers or analysis.
     Return only the caption text.
 
     Transcript analysis:
