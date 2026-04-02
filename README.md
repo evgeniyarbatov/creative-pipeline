@@ -1,8 +1,37 @@
 # Creative Pipeline: Social Caption Generator
 
-This pipeline generates platform-specific social captions from your transcript files using CrewAI + Ollama (`gemma3:latest`).
+Generate platform-specific social captions from transcript files using CrewAI + Ollama.
 
-## What It Does
+## Requirements
+
+- Python 3.12
+- Ollama running locally
+
+## Quick Start
+
+1. Install and run Ollama.
+2. Pull the default model:
+
+```bash
+ollama pull gemma3:latest
+```
+
+3. Create the virtual environment and install dependencies:
+
+```bash
+make install
+```
+
+4. Add at least one transcript `.txt` file (see "Transcripts" below).
+5. Run the pipeline:
+
+```bash
+make run-captions
+```
+
+By default, the pipeline reads transcripts from `~/Documents/art-talks` and writes outputs into a subfolder per artwork.
+
+## What It Produces
 
 For each transcript in `~/Documents/art-talks/*.txt`, the pipeline creates:
 
@@ -17,8 +46,35 @@ For each transcript in `~/Documents/art-talks/*.txt`, the pipeline creates:
 - `~/Documents/art-talks/<artwork-name>/tags.txt` (shared tags for all platforms)
 - `~/Documents/art-talks/<artwork-name>/transcript_analysis.txt` (structured extraction used downstream)
 
-The captions share a common transcript analysis agent, adapt to each platform's style rules, and then
-run through a personality styling pass before final output.
+`<artwork-name>` is the transcript filename without the `.txt` extension.
+
+## Transcripts
+
+### Where to put them
+
+Default input directory:
+
+- `~/Documents/art-talks`
+
+Each transcript should be a plain text file:
+
+- `~/Documents/art-talks/<artwork-name>.txt`
+
+You can change the input directory with `--transcripts-dir`.
+
+### Getting transcripts from Voice Memos on macOS
+
+1. Open the Voice Memos app.
+2. Select a recording.
+3. Open the transcript view (the Transcript or speech-bubble icon).
+4. Select all text and copy it.
+5. Paste into a new file in `~/Documents/art-talks/` named `<artwork-name>.txt`.
+
+Tip: keep filenames short and descriptive. The filename becomes the output folder name.
+
+## Data Notes
+
+Transcripts and generated captions live outside the repo (under `~/Documents/art-talks` by default). This repo does not include personal transcript data.
 
 ## High-Level Design
 
@@ -26,34 +82,17 @@ The pipeline is intentionally split into configuration and execution:
 
 - Unified configs live in `agents/*.yaml` with both `agent` and `task` sections.
 - Each file defines the agent persona plus the prompt template and expected output.
-- The runtime (in `scripts/captions_pipeline.py`) wires agents + tasks together using CrewAI.
+- The runtime in `scripts/captions_pipeline.py` wires agents + tasks together using CrewAI.
 
-For each transcript, the execution flow is:
+Execution flow per transcript:
 
 1. Load the transcript text.
-2. Analyze transcript and extract using `agents/transcript.yaml`.
-3. Run the tags task to generate reusable tags.
-4. Run each platform task to produce a base caption using the analyzed transcript as input.
-5. Run the personality styling task to rewrite each platform caption into `personality/`.
+2. Analyze the transcript (`agents/transcript.yaml`).
+3. Generate shared tags (`agents/tags.yaml`).
+4. Generate a base caption for each platform.
+5. Apply personality styling to each platform caption.
 
-Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt` and `transcript_analysis.txt`. Personality-styled captions land in `~/Documents/art-talks/<artwork-name>/personality/`.
-
-## Prerequisites
-
-1. Install and run Ollama.
-2. Pull the model:
-
-```bash
-ollama pull gemma3:latest
-```
-
-3. Create the virtual environment and install dependencies:
-
-```bash
-make install
-```
-
-## Run The Pipeline
+## Usage
 
 ```bash
 make run-captions
@@ -62,6 +101,7 @@ make run-captions
 Optional flags:
 
 - `--platforms facebook instagram` (generate a subset)
+- `--transcripts-dir /path/to/transcripts`
 - `--output-dir /path/to/output` (defaults to the transcript dir)
 - `--ollama-base-url http://localhost:11434`
 - `--config-dir /path/to/configs` (directory of per-platform YAML configs)
@@ -113,3 +153,7 @@ make test
 ```
 
 Tests focus on path and output logic so you can change copy rules without breaking IO.
+
+## License
+
+MIT. See `LICENSE`.
