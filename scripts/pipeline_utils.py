@@ -21,7 +21,7 @@ def build_output_paths(output_dir: Path, platforms: Iterable[str] = DEFAULT_PLAT
     return {platform: output_dir / f"{platform}.txt" for platform in platforms}
 
 
-HASHTAG_RE = re.compile(r"(?<!\\w)#(?=\\w*[A-Za-z])\\w+")
+HASHTAG_RE = re.compile(r"(?<!\w)#(?=\w*[A-Za-z])\w+")
 
 
 def strip_hashtags(text: str) -> str:
@@ -47,7 +47,7 @@ def normalize_tags_output(output_path: Path) -> None:
         tag = tag.strip(" \t.,;:!?\"'()[]{}")
         if not tag:
             continue
-        tag = re.split(r"[\\s-]+", tag)[0]
+        tag = re.split(r"[\s-]+", tag)[0]
         if not tag:
             continue
         if tag not in seen:

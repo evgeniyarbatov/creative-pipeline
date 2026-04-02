@@ -16,7 +16,7 @@ task:
     - lead with subject + medium when known
     - keep clear, searchable, natural
     - mention style, mood, or use-case only if supported
-    - no hashtags, emojis, labels, quotes, or analysis
+    - do not use hashtags, emojis, labels, quotes, or analysis
     - do not invent details
 
     Context:

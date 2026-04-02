@@ -47,10 +47,11 @@ def load_agent_config(path: Path) -> dict[str, Any]:
         unknown_list = ", ".join(sorted(unknown))
         raise AgentConfigError(f"Unknown keys in {path}: {unknown_list}")
 
-    for required in ("role", "goal", "backstory"):
+    for required in ("role", "goal"):
         if required not in raw:
             raise AgentConfigError(f"Missing '{required}' in {path}")
 
+    raw.setdefault("backstory", "")
     raw.setdefault("allow_delegation", False)
     raw.setdefault("verbose", False)
     return raw
