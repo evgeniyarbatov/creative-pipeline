@@ -62,6 +62,7 @@ def normalize_tags_output(output_path: Path) -> None:
         tag = re.split(r"[\s-]+", tag)[0]
         if not tag:
             continue
+        tag = tag.lower()
         if tag not in seen:
             tags.append(tag)
             seen.add(tag)
