@@ -18,7 +18,7 @@ The captions share a common voice agent and then adapt to each platform's style 
 
 The pipeline is intentionally split into configuration and execution:
 
-- Unified configs live in `config/agents/*.yaml` with both `agent` and `task` sections.
+- Unified configs live in `agents/*.yaml` with both `agent` and `task` sections.
 - Each file defines the agent persona plus the prompt template and expected output.
 - The runtime (in `scripts/captions_pipeline.py`) wires agents + tasks together using CrewAI.
 
@@ -91,25 +91,25 @@ This is meant for future expansion (image notes, intended audience, links, etc.)
 
 To add a new platform:
 
-1. Add a new YAML file in `config/agents/<platform>.yaml` with both `agent` and `task` sections.
+1. Add a new YAML file in `agents/<platform>.yaml` with both `agent` and `task` sections.
 2. Pass the new platform name via `--platforms` or add it to `DEFAULT_PLATFORMS` in `scripts/pipeline_utils.py`.
 
 ## Configuration Files
 
-Each config file lives under `config/agents/` and contains two sections:
+Each config file lives under `agents/` and contains two sections:
 
 - `agent`: persona settings for the CrewAI agent
 - `task`: prompt template plus expected output
 
 Configs included:
 
-- `config/agents/voice.yaml`
-- `config/agents/personality.yaml`
-- `config/agents/tags.yaml`
-- `config/agents/facebook.yaml`
-- `config/agents/instagram.yaml`
-- `config/agents/deviantart.yaml`
-- `config/agents/pinterest.yaml`
+- `agents/voice.yaml`
+- `agents/personality.yaml`
+- `agents/tags.yaml`
+- `agents/facebook.yaml`
+- `agents/instagram.yaml`
+- `agents/deviantart.yaml`
+- `agents/pinterest.yaml`
 
 `agent` supports:
 

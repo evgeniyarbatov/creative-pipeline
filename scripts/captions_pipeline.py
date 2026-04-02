@@ -183,7 +183,7 @@ def process_transcript(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate social captions from art transcripts.")
-    default_config_dir = str(Path(__file__).resolve().parents[1] / "config" / "agents")
+    default_config_dir = str(Path(__file__).resolve().parents[1] / "agents")
     parser.add_argument(
         "--transcripts-dir",
         default=os.path.expanduser("~/Documents/art-talks"),
