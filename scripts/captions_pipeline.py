@@ -285,23 +285,31 @@ def process_transcript(
 
     if base_complete and not personality_complete:
         # Only run the personality pass when base captions already exist.
-        personality_tasks = build_personality_tasks(agents, task_configs, output_dir, platforms)
         personality_dir = personality_output_dir(output_dir)
         personality_dir.mkdir(parents=True, exist_ok=True)
-        personality_crew = Crew(
-            agents=[agents["personality"]],
-            tasks=personality_tasks,
-            process=Process.sequential,
-            verbose=True,
-        )
-        personality_crew.kickoff()
-        for platform, task in zip(platforms, personality_tasks, strict=True):
+        for platform in platforms:
+            output_path = personality_dir / f"{platform}.txt"
+            if output_text_ready(output_path):
+                continue
+            personality_task = build_personality_task(
+                agents,
+                task_configs,
+                output_dir,
+                platform,
+            )
+            personality_crew = Crew(
+                agents=[agents["personality"]],
+                tasks=[personality_task],
+                process=Process.sequential,
+                verbose=True,
+            )
+            personality_crew.kickoff()
             persist_task_output(
-                task,
-                personality_dir / f"{platform}.txt",
+                personality_task,
+                output_path,
                 f"{platform} personality output",
             )
-        normalize_personality_outputs(output_dir, platforms)
+            normalize_personality_outputs(output_dir, [platform])
         return
 
     # Step 2: analyze transcript into a structured extraction.
@@ -324,56 +332,69 @@ def process_transcript(
         "transcript analysis",
     )
 
-    # Step 3 + 4: generate tags, then base captions per platform.
+    # Step 3: generate tags.
     tag_task = build_tags_task(agents, task_configs, transcript_analysis, output_dir)
-    platform_tasks = build_platform_tasks(
-        agents,
-        task_configs,
-        transcript_analysis,
-        tag_task,
-        output_dir,
-        platforms,
-    )
-    generation_tasks = [tag_task, *platform_tasks]
 
-    generation_crew = Crew(
-        agents=[agents["tags"], *[agents[platform] for platform in platforms]],
-        tasks=generation_tasks,
+    tags_crew = Crew(
+        agents=[agents["tags"]],
+        tasks=[tag_task],
         process=Process.sequential,
         verbose=True,
     )
-    generation_crew.kickoff()
+    tags_crew.kickoff()
     persist_task_output(
         tag_task,
         tags_output_path(output_dir),
         "tags",
     )
     normalize_tags_output(tags_output_path(output_dir))
-    for platform, task in zip(platforms, platform_tasks, strict=True):
+
+    # Step 4 + 5: generate per-platform captions, then immediately apply personality styling.
+    personality_dir = personality_output_dir(output_dir)
+    personality_dir.mkdir(parents=True, exist_ok=True)
+
+    for platform in platforms:
+        platform_tasks = build_platform_tasks(
+            agents,
+            task_configs,
+            transcript_analysis,
+            tag_task,
+            output_dir,
+            [platform],
+        )
+        platform_task = platform_tasks[0]
+        platform_crew = Crew(
+            agents=[agents[platform]],
+            tasks=[platform_task],
+            process=Process.sequential,
+            verbose=True,
+        )
+        platform_crew.kickoff()
         persist_task_output(
-            task,
+            platform_task,
             output_dir / f"{platform}.txt",
             f"{platform} caption",
         )
 
-    # Step 5: apply personality styling to each platform caption.
-    personality_tasks = build_personality_tasks(agents, task_configs, output_dir, platforms)
-    personality_dir = personality_output_dir(output_dir)
-    personality_dir.mkdir(parents=True, exist_ok=True)
-    personality_crew = Crew(
-        agents=[agents["personality"]],
-        tasks=personality_tasks,
-        process=Process.sequential,
-        verbose=True,
-    )
-    personality_crew.kickoff()
-    for platform, task in zip(platforms, personality_tasks, strict=True):
+        personality_task = build_personality_task(
+            agents,
+            task_configs,
+            output_dir,
+            platform,
+        )
+        personality_crew = Crew(
+            agents=[agents["personality"]],
+            tasks=[personality_task],
+            process=Process.sequential,
+            verbose=True,
+        )
+        personality_crew.kickoff()
         persist_task_output(
-            task,
+            personality_task,
             personality_dir / f"{platform}.txt",
             f"{platform} personality output",
         )
-    normalize_personality_outputs(output_dir, platforms)
+        normalize_personality_outputs(output_dir, [platform])
 
 
 def main() -> None:
