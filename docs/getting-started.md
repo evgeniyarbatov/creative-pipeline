@@ -2,18 +2,6 @@
 
 This pipeline generates social captions from transcript `.txt` files using CrewAI + Ollama.
 
-## Requirements
-
-- Python 3.12
-- Ollama running locally
-
-## Install
-
-```bash
-ollama pull gemma3:latest
-make install
-```
-
 ## Add Transcripts
 
 Default input directory:
@@ -29,7 +17,7 @@ Each transcript should be a plain text file:
 ## Run
 
 ```bash
-make run-captions
+make
 ```
 
 By default, outputs are written under `~/Documents/art-talks/<artwork-name>/`.
@@ -51,4 +39,4 @@ Per transcript, the pipeline creates:
 
 ## Data Notes
 
-Transcripts and generated captions live outside the repo. This repo does not include personal transcript data.
+Transcripts and generated captions live outside the repo.
