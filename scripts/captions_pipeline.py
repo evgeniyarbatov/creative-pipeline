@@ -11,7 +11,6 @@ from crewai import Agent, Crew, Process, Task
 from agent_config import AgentConfigError, load_agent_config
 from task_config import TaskConfigError, load_task_config
 from pipeline_utils import (
-    DEFAULT_PLATFORMS,
     derive_artwork_name,
     normalize_tags_output,
     normalize_personality_outputs,
@@ -127,6 +126,20 @@ def load_task_configs(config_dir: Path, platforms: Iterable[str]) -> dict[str, d
         task_configs[platform] = load_task_config(config_dir / f"{platform}.yaml")
 
     return task_configs
+
+
+def discover_platforms(config_dir: Path) -> list[str]:
+    excluded = {"transcript", "personality", "tags"}
+    platforms = sorted(
+        {
+            path.stem
+            for path in config_dir.glob("*.yaml")
+            if path.stem not in excluded
+        }
+    )
+    if not platforms:
+        raise SystemExit(f"No platform configs found in {config_dir}")
+    return platforms
 
 
 def build_transcript_task(
@@ -411,8 +424,8 @@ def main() -> None:
     parser.add_argument(
         "--platforms",
         nargs="+",
-        default=list(DEFAULT_PLATFORMS),
-        help="Platforms to generate (default: all).",
+        default=None,
+        help="Platforms to generate (default: all configs in the config dir).",
     )
     parser.add_argument(
         "--config-dir",
@@ -437,8 +450,6 @@ def main() -> None:
 
     output_root = Path(args.output_dir).expanduser() if args.output_dir else transcripts_dir
 
-    platforms = [platform.lower() for platform in args.platforms]
-
     llm = get_llm(args.model, args.ollama_base_url)
     override_dirs = [value for value in (args.agents_dir, args.tasks_dir) if value]
     if override_dirs:
@@ -453,6 +464,11 @@ def main() -> None:
     configs_dir = Path(config_dir).expanduser()
     if not configs_dir.exists():
         raise SystemExit(f"Config directory not found: {configs_dir}")
+
+    if args.platforms:
+        platforms = [platform.lower() for platform in args.platforms]
+    else:
+        platforms = discover_platforms(configs_dir)
     try:
         task_configs = load_task_configs(configs_dir, platforms)
     except TaskConfigError as exc:

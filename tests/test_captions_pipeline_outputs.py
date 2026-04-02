@@ -4,6 +4,7 @@ import pytest
 
 from captions_pipeline import (
     base_output_paths,
+    discover_platforms,
     output_text_ready,
     outputs_complete,
     persist_task_output,
@@ -80,3 +81,22 @@ def test_outputs_complete_personality_outputs(tmp_path):
     (personality_dir / "instagram.txt").write_text("styled caption", encoding="utf-8")
 
     assert outputs_complete(personality_output_paths(output_dir, ["instagram"])) is True
+
+
+def test_discover_platforms_ignores_non_platform_configs(tmp_path):
+    (tmp_path / "transcript.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+    (tmp_path / "tags.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+    (tmp_path / "personality.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+    (tmp_path / "instagram.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+    (tmp_path / "facebook.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+
+    assert discover_platforms(tmp_path) == ["facebook", "instagram"]
+
+
+def test_discover_platforms_requires_at_least_one_platform(tmp_path):
+    (tmp_path / "transcript.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+    (tmp_path / "tags.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+    (tmp_path / "personality.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
+
+    with pytest.raises(SystemExit):
+        discover_platforms(tmp_path)

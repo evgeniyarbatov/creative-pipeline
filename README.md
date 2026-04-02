@@ -71,7 +71,7 @@ Optional flags:
 To add a new platform:
 
 1. Add a new YAML file in `agents/<platform>.yaml` with both `agent` and `task` sections.
-2. Pass the new platform name via `--platforms` or add it to `DEFAULT_PLATFORMS` in `scripts/pipeline_utils.py`.
+2. Pass the new platform name via `--platforms`, or omit `--platforms` to auto-detect all platform configs in `agents/`.
 
 ## Configuration Files
 
