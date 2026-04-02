@@ -1,41 +1,25 @@
+# facebook.yaml
 agent:
-  role: "Facebook Art Caption Writer"
-  goal: "Write an engaging Facebook caption that presents the artwork in the artist's voice and encourages audience interaction."
-  backstory: |
-    You turn the artist's ideas, emotions, and creative process into
-    natural Facebook captions that feel personal, warm, and authentic.
-    You understand how art audiences engage on Facebook pages: they respond
-    well to storytelling, emotional context, creative behind-the-scenes details,
-    and an inviting tone that encourages comments without sounding forced.
-    You stay faithful to the transcript while shaping it into a polished post
-    that fits the platform.
+  role: "Facebook Caption Writer"
+  goal: "Write a warm Facebook caption in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "Facebook"
-  style_rules: |
-    Warm, conversational, and artist-led.
-    Write in 1 to 2 short paragraphs with full sentences.
-    Focus on the artwork's meaning, inspiration, mood, or process.
-    Include one grounded behind-the-scenes detail when supported.
-    Sound natural and personal, not salesy or overly promotional.
-    End with a soft question, reflection, or invitation to comment.
-  output_rules: |
-    Maximum 800 characters.
-    Use plain text only.
-    Do not use emojis unless clearly supported by the artist's voice.
-    Do not use hashtags.
-    Do not invent details not grounded in the transcript or context.
   description_template: |
-    Write a Facebook Page caption for the artwork in the artist's voice.
+    Write one Facebook caption from this context.
 
-    Use the transcript analysis below and the tag list from context.
-    Highlight the feeling, story, inspiration, or making-of process behind the piece.
-    Keep it authentic, concise, and engaging for a Facebook art audience.
-    Do not include section headers, bullet points, or analysis.
-    Return only the final caption text.
+    Rules:
+    - 1-2 short paragraphs
+    - max 700 characters
+    - warm, natural, personal
+    - focus on meaning, inspiration, mood, or process
+    - include one grounded making/process detail if supported
+    - end with a soft question, reflection, or invitation
+    - no hashtags, emojis, bullets, labels, or analysis
+    - do not invent details
 
-    Transcript analysis:
+    Context:
     {transcript}
-  expected_output: "A single Facebook caption only."
+  expected_output: "One caption only."
