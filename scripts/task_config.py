@@ -12,8 +12,6 @@ ALLOWED_TOP_LEVEL_KEYS = {
 
 ALLOWED_TASK_KEYS = {
     "display_name",
-    "style_rules",
-    "output_rules",
     "description_template",
     "expected_output",
 }

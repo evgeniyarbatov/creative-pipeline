@@ -140,13 +140,9 @@ def build_platform_tasks(
     for platform in platforms:
         config = task_configs[platform]
         display_name = config.get("display_name", platform.title())
-        style_rules = config.get("style_rules", "")
-        output_rules = config.get("output_rules", "")
         output_path = output_dir / f"{platform}.txt"
         description = config["description_template"].format(
             display_name=display_name,
-            style_rules=style_rules,
-            output_rules=output_rules,
             transcript=transcript_analysis,
         )
 
