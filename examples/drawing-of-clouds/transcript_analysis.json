@@ -1,28 +1,32 @@
 ```json
 {
-  "overview": "This artist created a drawing of clouds, inspired by observing a bright summer sky and the feeling of enjoying the outdoors. The piece aims to capture the fleeting nature of light and movement in the clouds, encouraging a mindful appreciation of the present moment and a sense of wonder.",
+  "overview": "This artist created a drawing of clouds inspired by observing a bright summer sky and the fleeting nature of light and moments. The piece aims to capture the dynamic movement of clouds and evoke a sense of appreciation for simple, contemplative experiences outdoors. The drawing emphasizes shifting forms and light, rather than a fixed representation, to convey a feeling of transient beauty and encourage observation.",
   "points": [
-    "The drawing was inspired by observing bright, fluffy clouds on a summer day.",
-    "The artist sought to represent the movement and changing light of clouds, rather than a static representation.",
-    "The use of wiggly lines and multiple shapes attempts to convey the dynamic nature of the clouds.",
-    "The artist wanted to evoke a feeling of joy and contemplation while observing the clouds.",
-    "There is an emphasis on the impermanence of moments and the importance of appreciating them.",
-    "The artwork encourages viewers to ‘think bigger’ and ‘dream bigger’ through this observation.",
-    "The process involves attempting to capture motion through layering and shifting lines."
+    "The artwork was initially inspired by observing large, white, fluffy clouds drifting across a bright summer sky.",
+    "The artist seeks to capture the movement and changing light of clouds, avoiding a static representation.",
+    "The drawing utilizes wiggly lines and multiple shapes to suggest the clouds' constant motion and transformation.",
+    "The artist intentionally avoids drawing a single, definitive shape for each cloud, reflecting the dynamic nature of the skies.",
+    "The piece is intended to provoke a sense of joy and contemplation while observing the clouds.",
+    "The artwork explores the transient nature of moments and the importance of appreciating them.",
+    "The goal is to inspire viewers to ‘think bigger’ and ‘dream bigger’ through observation and reflection.",
+    "The artist’s technique involves creating a sense of movement and change through layered, shifting forms."
   ],
   "phrases": [
     "It's very difficult to do in a drawing.",
-    "To not draw a single shape, but to draw many shapes.",
-    "You want to remember this moment and you want to remember as many moments like this as possible."
+    "to not draw a single shape, but to draw many shapes",
+    "bring you a sense of joy of looking at the clouds",
+    "this moment in time, it's passing, it's passing, it's never to return"
   ],
   "process": [
-    "Drawing technique: Utilizes wiggly lines and layering shapes to represent movement.",
-    "Materials: Not explicitly stated, but likely traditional drawing media (pencil, charcoal, etc.)."
+    "Drawing technique involves creating multiple, overlapping lines.",
+    "Emphasis on capturing motion rather than a precise, static image.",
+    "Use of wiggly lines to represent the fluidity of clouds and changing light."
   ],
   "mood": [
-    "Serene",
-    "Reflective",
     "Contemplative",
+    "Serene",
+    "Peaceful",
+    "Reflective",
     "Joyful"
   ]
 }
