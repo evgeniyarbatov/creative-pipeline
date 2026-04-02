@@ -5,6 +5,11 @@ from typing import Any
 
 import yaml
 
+ALLOWED_TOP_LEVEL_KEYS = {
+    "agent",
+    "task",
+}
+
 ALLOWED_AGENT_KEYS = {
     "role",
     "goal",
@@ -25,6 +30,17 @@ def load_agent_config(path: Path) -> dict[str, Any]:
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         raise AgentConfigError(f"Agent config must be a mapping: {path}")
+
+    if "agent" in raw or "task" in raw:
+        unknown_top = set(raw.keys()) - ALLOWED_TOP_LEVEL_KEYS
+        if unknown_top:
+            unknown_list = ", ".join(sorted(unknown_top))
+            raise AgentConfigError(f"Unknown top-level keys in {path}: {unknown_list}")
+        if "agent" not in raw:
+            raise AgentConfigError(f"Missing 'agent' section in {path}")
+        raw = raw["agent"]
+        if not isinstance(raw, dict):
+            raise AgentConfigError(f"'agent' section must be a mapping: {path}")
 
     unknown = set(raw.keys()) - ALLOWED_AGENT_KEYS
     if unknown:

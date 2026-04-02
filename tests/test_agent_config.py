@@ -7,9 +7,13 @@ def test_load_agent_config_defaults(tmp_path):
     config_file = tmp_path / "voice.yaml"
     config_file.write_text(
         """
-role: "Voice"
-goal: "Capture voice"
-backstory: "Backstory"
+agent:
+  role: "Voice"
+  goal: "Capture voice"
+  backstory: "Backstory"
+task:
+  description_template: "Do thing with {transcript}"
+  expected_output: "Result"
 """.strip(),
         encoding="utf-8",
     )
@@ -24,10 +28,14 @@ def test_load_agent_config_unknown_key(tmp_path):
     config_file = tmp_path / "voice.yaml"
     config_file.write_text(
         """
-role: "Voice"
-goal: "Capture voice"
-backstory: "Backstory"
-extra: "nope"
+agent:
+  role: "Voice"
+  goal: "Capture voice"
+  backstory: "Backstory"
+  extra: "nope"
+task:
+  description_template: "Do thing"
+  expected_output: "Result"
 """.strip(),
         encoding="utf-8",
     )
@@ -40,8 +48,27 @@ def test_load_agent_config_missing_required(tmp_path):
     config_file = tmp_path / "voice.yaml"
     config_file.write_text(
         """
-role: "Voice"
-backstory: "Backstory"
+agent:
+  role: "Voice"
+  backstory: "Backstory"
+task:
+  description_template: "Do thing"
+  expected_output: "Result"
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(AgentConfigError):
+        load_agent_config(config_file)
+
+
+def test_load_agent_config_missing_section(tmp_path):
+    config_file = tmp_path / "voice.yaml"
+    config_file.write_text(
+        """
+task:
+  description_template: "Do thing"
+  expected_output: "Result"
 """.strip(),
         encoding="utf-8",
     )

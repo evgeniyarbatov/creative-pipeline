@@ -32,9 +32,9 @@ def get_llm(model_name: str, base_url: str | None):
         return Ollama(model=model_name, **kwargs)
 
 
-def build_agents(llm, agents_dir: Path, platforms: Iterable[str]) -> dict[str, Agent]:
+def build_agents(llm, config_dir: Path, platforms: Iterable[str]) -> dict[str, Agent]:
     def build_agent(name: str) -> Agent:
-        config = load_agent_config(agents_dir / f"{name}.yaml")
+        config = load_agent_config(config_dir / f"{name}.yaml")
         return Agent(**config, llm=llm)
 
     agents: dict[str, Agent] = {
@@ -49,15 +49,15 @@ def build_agents(llm, agents_dir: Path, platforms: Iterable[str]) -> dict[str, A
     return agents
 
 
-def load_task_configs(tasks_dir: Path, platforms: Iterable[str]) -> dict[str, dict[str, str]]:
+def load_task_configs(config_dir: Path, platforms: Iterable[str]) -> dict[str, dict[str, str]]:
     task_configs = {
-        "voice": load_task_config(tasks_dir / "voice.yaml"),
-        "personality": load_task_config(tasks_dir / "personality.yaml"),
-        "tags": load_task_config(tasks_dir / "tags.yaml"),
+        "voice": load_task_config(config_dir / "voice.yaml"),
+        "personality": load_task_config(config_dir / "personality.yaml"),
+        "tags": load_task_config(config_dir / "tags.yaml"),
     }
 
     for platform in platforms:
-        task_configs[platform] = load_task_config(tasks_dir / f"{platform}.yaml")
+        task_configs[platform] = load_task_config(config_dir / f"{platform}.yaml")
 
     return task_configs
 
@@ -143,7 +143,7 @@ def process_transcript(
     output_root: Path,
     platforms: Iterable[str],
     llm,
-    agents_dir: Path,
+    config_dir: Path,
     task_configs: dict[str, dict[str, str]],
     dry_run: bool,
 ) -> None:
@@ -168,7 +168,7 @@ def process_transcript(
         print(f"  - tags: {output_dir / 'tags.txt'}")
         return
 
-    agents = build_agents(llm, agents_dir, platforms)
+    agents = build_agents(llm, config_dir, platforms)
     tasks = build_tasks(agents, task_configs, transcript_text, context_text, output_dir, platforms)
 
     crew = Crew(
@@ -183,6 +183,7 @@ def process_transcript(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate social captions from art transcripts.")
+    default_config_dir = str(Path(__file__).resolve().parents[1] / "config" / "agents")
     parser.add_argument(
         "--transcripts-dir",
         default=os.path.expanduser("~/Documents/art-talks"),
@@ -213,14 +214,19 @@ def main() -> None:
         help="Platforms to generate (default: all).",
     )
     parser.add_argument(
+        "--config-dir",
+        default=default_config_dir,
+        help="Directory containing per-platform YAML configs (agent + task sections).",
+    )
+    parser.add_argument(
         "--agents-dir",
-        default=str(Path(__file__).resolve().parents[1] / "config" / "agents"),
-        help="Directory containing per-agent YAML configs.",
+        default=None,
+        help="Deprecated alias for --config-dir.",
     )
     parser.add_argument(
         "--tasks-dir",
-        default=str(Path(__file__).resolve().parents[1] / "config" / "tasks"),
-        help="Directory containing per-task YAML configs.",
+        default=None,
+        help="Deprecated alias for --config-dir.",
     )
     parser.add_argument(
         "--dry-run",
@@ -239,14 +245,21 @@ def main() -> None:
     platforms = [platform.lower() for platform in args.platforms]
 
     llm = get_llm(args.model, args.ollama_base_url)
-    agents_dir = Path(args.agents_dir).expanduser()
-    if not agents_dir.exists():
-        raise SystemExit(f"Agent config directory not found: {agents_dir}")
-    tasks_dir = Path(args.tasks_dir).expanduser()
-    if not tasks_dir.exists():
-        raise SystemExit(f"Task config directory not found: {tasks_dir}")
+    override_dirs = [value for value in (args.agents_dir, args.tasks_dir) if value]
+    if override_dirs:
+        if len(set(override_dirs)) > 1:
+            raise SystemExit("--agents-dir and --tasks-dir must match; configs are unified.")
+        if args.config_dir != default_config_dir and args.config_dir != override_dirs[0]:
+            raise SystemExit("--config-dir cannot be combined with --agents-dir/--tasks-dir.")
+        config_dir = override_dirs[0]
+    else:
+        config_dir = args.config_dir
+
+    configs_dir = Path(config_dir).expanduser()
+    if not configs_dir.exists():
+        raise SystemExit(f"Config directory not found: {configs_dir}")
     try:
-        task_configs = load_task_configs(tasks_dir, platforms)
+        task_configs = load_task_configs(configs_dir, platforms)
     except TaskConfigError as exc:
         raise SystemExit(str(exc)) from exc
 
@@ -262,7 +275,7 @@ def main() -> None:
                 output_root,
                 platforms,
                 llm,
-                agents_dir,
+                configs_dir,
                 task_configs,
                 args.dry_run,
             )

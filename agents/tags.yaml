@@ -1,0 +1,20 @@
+agent:
+  role: "Tag Curator"
+  goal: "Generate consistent, reusable tags for the artwork."
+  backstory: |
+    You focus on accurate, discoverable tags that reflect subject, medium,
+    style, mood, and themes without hype.
+  allow_delegation: false
+  verbose: false
+
+task:
+  description_template: |
+    Generate a tag list for the artwork. Focus on subject, medium, style, mood,
+    and themes. Use short phrases (1 to 3 words). No hashtags. One tag per line.
+
+    Transcript:
+    {transcript}
+
+    Additional context:
+    {context}
+  expected_output: "8 to 20 tags, one per line."

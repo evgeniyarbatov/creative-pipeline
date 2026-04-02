@@ -18,8 +18,8 @@ The captions share a common voice agent and then adapt to each platform's style 
 
 The pipeline is intentionally split into configuration and execution:
 
-- Agent definitions live in `config/agents/*.yaml` and are loaded at runtime.
-- Task definitions live in `config/tasks/*.yaml` and define prompt templates and expected outputs.
+- Unified configs live in `config/agents/*.yaml` with both `agent` and `task` sections.
+- Each file defines the agent persona plus the prompt template and expected output.
 - The runtime (in `scripts/captions_pipeline.py`) wires agents + tasks together using CrewAI.
 
 For each transcript, the execution flow is:
@@ -73,8 +73,7 @@ Optional flags:
 - `--output-dir /path/to/output` (defaults to the transcript dir)
 - `--dry-run` (inspect output paths without calling the model)
 - `--ollama-base-url http://localhost:11434`
-- `--agents-dir /path/to/agents` (directory of per-agent YAML configs)
-- `--tasks-dir /path/to/tasks` (directory of per-task YAML configs)
+- `--config-dir /path/to/configs` (directory of per-platform YAML configs)
 
 ## Adding Extra Context (Extensible Design)
 
@@ -92,13 +91,17 @@ This is meant for future expansion (image notes, intended audience, links, etc.)
 
 To add a new platform:
 
-1. Add a new agent YAML file in `config/agents/<platform>.yaml`.
-2. Add a new task YAML file in `config/tasks/<platform>.yaml`.
-3. Pass the new platform name via `--platforms` or add it to `DEFAULT_PLATFORMS` in `scripts/pipeline_utils.py`.
+1. Add a new YAML file in `config/agents/<platform>.yaml` with both `agent` and `task` sections.
+2. Pass the new platform name via `--platforms` or add it to `DEFAULT_PLATFORMS` in `scripts/pipeline_utils.py`.
 
-## Agent Configuration
+## Configuration Files
 
-Each agent is configured in its own YAML file under `config/agents/`:
+Each config file lives under `config/agents/` and contains two sections:
+
+- `agent`: persona settings for the CrewAI agent
+- `task`: prompt template plus expected output
+
+Configs included:
 
 - `config/agents/voice.yaml`
 - `config/agents/personality.yaml`
@@ -108,7 +111,7 @@ Each agent is configured in its own YAML file under `config/agents/`:
 - `config/agents/deviantart.yaml`
 - `config/agents/pinterest.yaml`
 
-Each file supports these keys:
+`agent` supports:
 
 - `role`
 - `goal`
@@ -116,19 +119,7 @@ Each file supports these keys:
 - `allow_delegation`
 - `verbose`
 
-## Task Configuration
-
-Each task is configured in its own YAML file under `config/tasks/`:
-
-- `config/tasks/voice.yaml`
-- `config/tasks/personality.yaml`
-- `config/tasks/tags.yaml`
-- `config/tasks/facebook.yaml`
-- `config/tasks/instagram.yaml`
-- `config/tasks/deviantart.yaml`
-- `config/tasks/pinterest.yaml`
-
-Each file supports these keys:
+`task` supports:
 
 - `description_template`
 - `expected_output`
