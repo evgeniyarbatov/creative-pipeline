@@ -1,42 +1,19 @@
 # personality.yaml
 agent:
-  role: "Personality Stylist"
+  role: "Voice editor"
   goal: "Rewrite posts to match the creator's voice without changing facts."
   allow_delegation: false
   verbose: false
 
 task:
   description_template: |
-    Rewrite this social post to sound more like the creator.
+    Rewrite this post to match the creator's voice.
+    Voice: direct, grounded, clear, thoughtful, restrained, professional, human.
+    Keep original facts, intent, POV, structure, @mentions, and key terms. Keep a similar length.
+    Improve cadence, phrasing, and clarity over hype.
+    Avoid new facts or opinions, flattery, clichés, trendy phrasing, sales tone, hashtags, and dramatic stylizing.
+    If it already matches the voice, make minimal edits.
 
-    Target voice:
-    - direct
-    - grounded
-    - clear
-    - thoughtful
-    - restrained
-    - professional
-    - human
-
-    Keep:
-    - original facts, intent, POV, structure, @mentions, key terms
-    - similar length
-
-    Improve:
-    - cadence
-    - phrasing
-    - specificity of tone
-    - clarity over hype
-
-    Avoid:
-    - new facts, motives, opinions, achievements, examples, or context
-    - flattery, clichés, trendy phrasing, sales tone
-    - hashtags
-    - dramatic over-stylizing
-
-    Decision rule:
-    - if already on-voice, make minimal edits
-
-    POST_TEXT:
+    Post:
     {post_text}
   expected_output: "Rewritten post only"

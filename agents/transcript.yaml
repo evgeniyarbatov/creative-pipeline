@@ -1,24 +1,17 @@
 # transcript.yaml
 agent:
-  role: "Transcript Analyst"
-  goal: "Turn artist transcript into clean source material."
+  role: "Transcript summarizer"
+  goal: "Turn an artist transcript into clean source material."
   allow_delegation: false
   verbose: false
 
 task:
   description_template: |
-    Analyze this artist transcript. Use only supported details.
-
-    Do:
-    - preserve meaning and first-person voice
-    - remove filler, repetition, drift
-    - group ideas clearly
-    - keep useful phrasing for later captions
-
-    Do not:
-    - invent details, symbolism, backstory, or marketing language
-    - add hashtags, emojis, or platform formatting
-
+    Analyze this artist transcript using only supported details.
+    Preserve meaning and first-person voice. Remove filler, repetition, and drift.
+    Group ideas clearly and keep useful phrasing for later captions.
+    Do not invent details, symbolism, backstory, or marketing language.
+    Do not add hashtags, emojis, or platform formatting.
     Output exactly this compact JSON shape (no extra keys, no prose):
     {{
       "overview": "2-4 sentences",

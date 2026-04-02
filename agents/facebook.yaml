@@ -1,6 +1,6 @@
 # facebook.yaml
 agent:
-  role: "Facebook Caption Writer"
+  role: "Facebook caption writer"
   goal: "Write a warm Facebook caption in the artist's voice."
   allow_delegation: false
   verbose: false
@@ -9,16 +9,10 @@ task:
   display_name: "Facebook"
   description_template: |
     Write one Facebook caption from this context.
-
-    Rules:
-    - 1-2 short paragraphs
-    - max 700 characters
-    - warm, natural, personal
-    - focus on meaning, inspiration, mood, or process
-    - include one grounded making/process detail if supported
-    - end with a soft question, reflection, or invitation
-    - do not use hashtags, emojis, bullets, labels, or analysis
-    - do not invent details
+    Use 1-2 short paragraphs, max 700 characters. Keep it warm, natural, and personal.
+    Focus on meaning, inspiration, mood, or process. Include one grounded making/process detail if supported.
+    End with a soft question, reflection, or invitation.
+    Do not use hashtags. No emojis, bullets, labels, or analysis. Do not invent details.
 
     Context:
     {transcript}

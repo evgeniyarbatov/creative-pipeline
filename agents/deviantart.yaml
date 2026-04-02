@@ -1,7 +1,7 @@
 # deviantart.yaml
 agent:
-  role: "DeviantArt Caption Writer"
-  goal: "Write a process-aware DeviantArt caption in the artist's voice."
+  role: "DeviantArt caption writer"
+  goal: "Write a DeviantArt caption in the artist's voice with process detail when supported."
   allow_delegation: false
   verbose: false
 
@@ -9,16 +9,9 @@ task:
   display_name: "DeviantArt"
   description_template: |
     Write one DeviantArt caption from this context.
-
-    Rules:
-    - 450-900 characters
-    - one clean body of text
-    - genuine, reflective, creator-led
-    - mention medium, tools, workflow, process, or intent only if supported
-    - can be slightly more process-aware than other platforms
-    - do not use hashtags, emojis, bullets, labels, or analysis
-    - do not invent details
-    - use tags naturally only if clearly useful
+    Keep it 450-900 characters in one paragraph. Make it genuine, reflective, and creator-led.
+    Mention medium, tools, workflow, process, or intent only if supported. It can be a bit more process-focused than other platforms.
+    Do not use hashtags. No emojis, bullets, labels, or analysis. Do not invent details. Use tags only if clearly useful.
 
     Context:
     {transcript}

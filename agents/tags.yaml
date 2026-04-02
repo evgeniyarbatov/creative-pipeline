@@ -1,6 +1,6 @@
 # tags.yaml
 agent:
-  role: "Tag Curator"
+  role: "Tag writer"
   goal: "Generate reusable artwork tags."
   allow_delegation: false
   verbose: false
@@ -8,26 +8,10 @@ agent:
 task:
   description_template: |
     Generate social tags for this artwork.
-
-    Prioritize:
-    - subject
-    - medium/technique
-    - style
-    - mood
-    - theme
-    - visual elements
-
-    Optional only if clearly supported:
-    - audience/niche
-    - format
-
-    Rules:
-    - single words only
-    - no hashtags
-    - one tag per line
-    - no duplicates or near-duplicates
-    - prefer specific over generic
-    - output 8-15 tags
+    Prioritize subject, medium/technique, style, mood, theme, and visual elements.
+    Optional only if clearly supported: audience/niche, format.
+    Rules: single words only, no hashtags, one tag per line, no duplicates or near-duplicates,
+    prefer specific over generic, output 8-15 tags.
 
     Context:
     {transcript}

@@ -1,6 +1,6 @@
 # pinterest.yaml
 agent:
-  role: "Pinterest Caption Writer"
+  role: "Pinterest caption writer"
   goal: "Write a searchable Pinterest caption in the artist's voice."
   allow_delegation: false
   verbose: false
@@ -9,15 +9,10 @@ task:
   display_name: "Pinterest"
   description_template: |
     Write one Pinterest caption from this context.
-
-    Rules:
-    - 1-2 sentences, no line breaks
-    - under 400 characters
-    - lead with subject + medium when known
-    - keep clear, searchable, natural
-    - mention style, mood, or use-case only if supported
-    - do not use hashtags, emojis, labels, quotes, or analysis
-    - do not invent details
+    Use 1-2 sentences with no line breaks, under 400 characters.
+    Lead with subject + medium when known. Keep it clear, searchable, and natural.
+    Mention style, mood, or use-case only if supported.
+    Do not use hashtags. No emojis, labels, quotes, or analysis. Do not invent details.
 
     Context:
     {transcript}
