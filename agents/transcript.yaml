@@ -19,27 +19,16 @@ task:
     - invent details, symbolism, backstory, or marketing language
     - add hashtags, emojis, or platform formatting
 
-    Output exactly these sections:
-    Artwork Overview: 2-4 sentences
-    Key Talking Points: 5-8 bullets
-    Phrases to Preserve: 0-5 short verbatim lines
-    Theme Notes:
-    - inspiration/meaning
-    - process/materials/technique
-    - emotional tone/intention
-    - viewer takeaway/reflection
-    Clean Source Copy: 1 concise first-person passage
-    Platform Hooks: 3-5 short lines
-    Do Not Use: bullets of unclear/repetitive/contradictory lines
+    Output exactly this compact JSON shape (no extra keys, no prose):
+    {
+      "overview": "2-4 sentences",
+      "points": ["5-8 bullets"],
+      "phrases": ["0-5 short verbatim lines"],
+      "process": ["process/materials/technique"],
+      "mood": ["emotional tone/intention"]
+    }
 
     Transcript:
     {transcript}
   expected_output: |
-    Sections only:
-    - Artwork Overview
-    - Key Talking Points
-    - Phrases to Preserve
-    - Theme Notes
-    - Clean Source Copy
-    - Platform Hooks
-    - Do Not Use
+    Compact JSON only with keys: overview, points, phrases, process, mood.
