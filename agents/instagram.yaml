@@ -14,19 +14,18 @@ task:
   display_name: "Instagram"
   style_rules: |
     Write in a vivid, visual, compact style.
-    Use short paragraphs or line breaks for rhythm and readability.
+    Use 2 to 4 short lines or line breaks for rhythm and readability.
     Sound like the artist, not a brand or curator.
     Emphasize mood, materials, gesture, texture, color, and one memorable detail.
     Be emotionally precise rather than explanatory.
     Avoid clichés, excessive abstraction, and generic praise.
     Do not invent facts that are not supported by the transcript or context.
+    End on a sensory or emotional note rather than a question or CTA.
   output_rules: |
     Write 400 to 900 characters total.
     Return only the caption text.
     Do not include titles, labels, quotation marks, or section headers.
-    Include 3 to 8 relevant hashtags only if they fit naturally and are supported
-    by the provided tag list or artwork context.
-    Prefer a clean ending over forcing hashtags.
+    Do not use hashtags.
   description_template: |
     Write an Instagram caption for the artwork in the artist's voice.
 

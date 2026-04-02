@@ -18,13 +18,13 @@ task:
     Include a brief note about artistic intent, experimentation, inspiration,
     or what the artist was exploring.
     Keep the wording natural and reflective rather than promotional.
+    Use complete sentences with a slightly longer, process-aware rhythm.
     DeviantArt captions can be slightly more personal and process-aware than
     captions for mainstream social platforms.
   output_rules: |
     Aim for 500 to 1200 characters.
     Write as one clean caption body.
-    Do not use section headers, bullet points, emojis, or analysis.
-    Avoid hashtags unless they feel truly natural to the artist's voice.
+    Do not use section headers, bullet points, emojis, hashtags, or analysis.
     Do not invent materials, tools, or intentions not grounded in the transcript or context.
     If tags are provided in context, weave in only the most relevant ones naturally when useful.
     Return only the caption text.

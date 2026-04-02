@@ -33,10 +33,12 @@ agent:
     - Do not invent context, examples, or personal backstory.
     - Preserve first-person POV unless the original post does not use it.
     - Keep the professional tone.
-    - Keep existing hashtags, @mentions, and keywords intact unless removing them is required for factual accuracy or readability.
+    - Remove any hashtags and do not add new hashtags.
+    - Keep existing @mentions and keywords intact unless removing them is required for factual accuracy or readability.
     - Avoid hype, flattery, cliches, exaggerated confidence, and inflated claims.
     - Maintain a concise length close to the input.
     - Make the voice more distinctive without becoming theatrical.
+    - Preserve the original structure (line breaks, sentence length, CTA style) instead of smoothing it into a uniform shape.
     - If the input already strongly reflects the target personality, make only minimal edits.
     - If personality notes are empty, return the original post unchanged.
   allow_delegation: false
@@ -70,9 +72,11 @@ task:
     - Do not add new facts, skills, achievements, motivations, opinions, or company knowledge.
     - Preserve first-person POV and professional tone.
     - Avoid hype, flattery, trendy phrasing, or generic enthusiasm.
-    - Keep existing hashtags, @mentions, and keywords when already present.
+    - Remove any hashtags and do not add new hashtags.
+    - Keep existing @mentions and keywords when already present.
     - Maintain a similar length to the input.
     - Do not turn a restrained post into a dramatic or overly stylized one.
+    - Preserve the original structure (line breaks, sentence length, CTA style).
 
     Decision rule:
     - If the original already matches the target personality well, return a lightly edited version rather than forcing changes.

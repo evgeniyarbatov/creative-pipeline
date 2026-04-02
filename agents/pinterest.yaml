@@ -13,13 +13,14 @@ task:
   display_name: "Pinterest"
   style_rules: |
     Write for Pinterest discovery: clear, searchable, concise, and natural.
-    Open with a strong lead sentence that names the artwork's subject or theme.
-    Highlight the visual style, mood, medium, or intended use when relevant.
-    Keep the copy skimmable and inspiring, not salesy or repetitive.
+    Open with a strong lead sentence that names the artwork's subject and medium.
+    Use 1 to 2 sentences only, no line breaks.
+    Highlight the visual style, mood, or intended use when relevant.
+    Keep the copy skimmable and search-friendly, not salesy or repetitive.
     Stay faithful to the artist's voice and the transcript analysis.
   output_rules: |
     Keep the caption under 500 characters.
-    Include 2 to 4 natural-fit keywords or hashtags at the end.
+    Do not use hashtags.
     Do not use emojis unless the artist's voice clearly supports them.
     Do not invent details not supported by the transcript or context.
   description_template: |

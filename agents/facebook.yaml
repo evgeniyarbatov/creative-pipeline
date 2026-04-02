@@ -16,15 +16,16 @@ task:
   display_name: "Facebook"
   style_rules: |
     Warm, conversational, and artist-led.
-    Write in 1 to 2 short paragraphs.
+    Write in 1 to 2 short paragraphs with full sentences.
     Focus on the artwork's meaning, inspiration, mood, or process.
+    Include one grounded behind-the-scenes detail when supported.
     Sound natural and personal, not salesy or overly promotional.
     End with a soft question, reflection, or invitation to comment.
   output_rules: |
     Maximum 800 characters.
     Use plain text only.
     Do not use emojis unless clearly supported by the artist's voice.
-    Avoid more than 2 hashtags.
+    Do not use hashtags.
     Do not invent details not grounded in the transcript or context.
   description_template: |
     Write a Facebook Page caption for the artwork in the artist's voice.

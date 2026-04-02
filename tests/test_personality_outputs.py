@@ -28,3 +28,12 @@ def test_normalize_personality_outputs_missing_post_text(tmp_path):
 
     with pytest.raises(TaskConfigError):
         normalize_personality_outputs(tmp_path, ["instagram"])
+
+
+def test_normalize_personality_outputs_strips_hashtags(tmp_path):
+    output_path = tmp_path / "instagram.txt"
+    output_path.write_text("Hello #Art world", encoding="utf-8")
+
+    normalize_personality_outputs(tmp_path, ["instagram"])
+
+    assert output_path.read_text(encoding="utf-8") == "Hello world"

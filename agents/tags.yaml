@@ -28,7 +28,7 @@ task:
     - content format (e.g. digital illustration, sketch)
 
     Rules:
-    - use short phrases (1 to 3 words)
+    - use single words only (no spaces or hyphenated phrases)
     - no hashtags
     - one tag per line
     - avoid duplicate or overlapping tags

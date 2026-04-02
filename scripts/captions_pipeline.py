@@ -14,6 +14,7 @@ from pipeline_utils import (
     DEFAULT_PLATFORMS,
     build_output_paths,
     derive_artwork_name,
+    normalize_tags_output,
     normalize_personality_outputs,
 )
 
@@ -284,6 +285,7 @@ def process_transcript(
         tags_output_path(output_dir),
         "tags",
     )
+    normalize_tags_output(tags_output_path(output_dir))
     for platform, task in zip(platforms, platform_tasks, strict=True):
         persist_task_output(
             task,
