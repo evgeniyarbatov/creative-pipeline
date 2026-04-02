@@ -1,17 +1,20 @@
-VENV ?= .venv
-PYTHON ?= $(VENV)/bin/python
-PIP ?= $(VENV)/bin/pip
+VENV_PATH := .venv
 
-.PHONY: venv install run-captions test
+PYTHON := $(VENV_PATH)/bin/python
+PIP := $(VENV_PATH)/bin/pip
+REQUIREMENTS := requirements.txt
+
+default: run-captions
 
 venv:
-	python -m venv $(VENV)
+	@python3 -m venv $(VENV_PATH)
 
 install: venv
-	$(PIP) install -r requirements.txt
+	@$(PIP) install --disable-pip-version-check -q --upgrade pip
+	@$(PIP) install --disable-pip-version-check -q -r $(REQUIREMENTS)
 
 run-captions:
 	$(PYTHON) scripts/captions_pipeline.py
 
-test: install
+test:
 	$(PYTHON) -m pytest -q
