@@ -14,7 +14,7 @@ install: venv
 	@$(PIP) install --disable-pip-version-check -q -r $(REQUIREMENTS)
 
 run-captions:
-	$(PYTHON) scripts/captions_pipeline.py
+	@$(PYTHON) scripts/captions_pipeline.py
 
 test:
-	$(PYTHON) -m pytest -q
+	@$(PYTHON) -m pytest -q
