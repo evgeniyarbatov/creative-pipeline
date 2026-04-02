@@ -29,13 +29,8 @@ make install
 5. Run the pipeline:
 
 ```bash
-make run-captions
+make
 ```
-
-## Requirements
-
-- Python 3.12
-- Ollama running locally
 
 ## Docs
 
