@@ -20,13 +20,13 @@ task:
     - add hashtags, emojis, or platform formatting
 
     Output exactly this compact JSON shape (no extra keys, no prose):
-    {
+    {{
       "overview": "2-4 sentences",
       "points": ["5-8 bullets"],
       "phrases": ["0-5 short verbatim lines"],
       "process": ["process/materials/technique"],
       "mood": ["emotional tone/intention"]
-    }
+    }}
 
     Transcript:
     {transcript}
