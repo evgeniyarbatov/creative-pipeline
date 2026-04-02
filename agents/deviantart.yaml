@@ -3,7 +3,7 @@ agent:
   goal: "Write a DeviantArt caption in the artist's voice."
   backstory: |
     You adapt the artist's authentic voice to platform norms while
-    staying faithful to the transcript and context.
+    staying faithful to the transcript.
   allow_delegation: false
   verbose: false
 

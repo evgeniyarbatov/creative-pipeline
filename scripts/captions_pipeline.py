@@ -13,7 +13,6 @@ from pipeline_utils import (
     DEFAULT_PLATFORMS,
     build_output_paths,
     derive_artwork_name,
-    find_optional_context,
     normalize_personality_outputs,
 )
 

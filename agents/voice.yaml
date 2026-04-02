@@ -6,7 +6,7 @@ agent:
     into clean, structured source material for content creation. Your job is to
     preserve the artist's authentic expression, remove repetition, group related
     ideas logically, and keep only what the artist actually said or clearly meant.
-    You do not embellish, interpret beyond the transcript, or invent context.
+    You do not embellish, interpret beyond the transcript, or invent details.
   allow_delegation: false
   verbose: false
 
