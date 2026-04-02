@@ -8,6 +8,7 @@ from typing import Iterable
 from task_config import TaskConfigError
 
 DEFAULT_PLATFORMS = ("facebook", "instagram", "deviantart", "pinterest")
+PERSONALITY_DIRNAME = "personality"
 
 
 def derive_artwork_name(transcript_path: Path) -> str:
@@ -19,6 +20,18 @@ def derive_artwork_name(transcript_path: Path) -> str:
 
 def build_output_paths(output_dir: Path, platforms: Iterable[str] = DEFAULT_PLATFORMS) -> dict[str, Path]:
     return {platform: output_dir / f"{platform}.txt" for platform in platforms}
+
+
+def personality_output_dir(output_dir: Path) -> Path:
+    return output_dir / PERSONALITY_DIRNAME
+
+
+def build_personality_output_paths(
+    output_dir: Path,
+    platforms: Iterable[str] = DEFAULT_PLATFORMS,
+) -> dict[str, Path]:
+    base_dir = personality_output_dir(output_dir)
+    return {platform: base_dir / f"{platform}.txt" for platform in platforms}
 
 
 HASHTAG_RE = re.compile(r"(?<!\w)#(?=\w*[A-Za-z])\w+")
@@ -61,8 +74,9 @@ def normalize_tags_output(output_path: Path) -> None:
 
 
 def normalize_personality_outputs(output_dir: Path, platforms: Iterable[str]) -> None:
+    personality_dir = personality_output_dir(output_dir)
     for platform in platforms:
-        output_path = output_dir / f"{platform}.txt"
+        output_path = personality_dir / f"{platform}.txt"
         raw = output_path.read_text(encoding="utf-8").strip()
         if not raw:
             raise TaskConfigError(f"Empty personality output for {platform}: {output_path}")

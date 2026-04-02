@@ -13,9 +13,11 @@ from task_config import TaskConfigError, load_task_config
 from pipeline_utils import (
     DEFAULT_PLATFORMS,
     build_output_paths,
+    build_personality_output_paths,
     derive_artwork_name,
     normalize_tags_output,
     normalize_personality_outputs,
+    personality_output_dir,
 )
 
 TRANSCRIPT_ANALYSIS_FILENAME = "transcript_analysis.txt"
@@ -39,13 +41,20 @@ def output_text_ready(path: Path) -> bool:
         return False
 
 
-def output_dir_complete(output_dir: Path, platforms: Iterable[str]) -> bool:
-    required_paths = [
+def base_output_paths(output_dir: Path, platforms: Iterable[str]) -> list[Path]:
+    return [
         transcript_analysis_path(output_dir),
         tags_output_path(output_dir),
         *[output_dir / f"{platform}.txt" for platform in platforms],
     ]
-    return all(output_text_ready(path) for path in required_paths)
+
+
+def personality_output_paths(output_dir: Path, platforms: Iterable[str]) -> list[Path]:
+    return [personality_output_dir(output_dir) / f"{platform}.txt" for platform in platforms]
+
+
+def outputs_complete(paths: Iterable[Path]) -> bool:
+    return all(output_text_ready(path) for path in paths)
 
 
 def read_required_text(path: Path, label: str) -> str:
@@ -201,33 +210,38 @@ def build_personality_tasks(
     output_dir: Path,
     platforms: Iterable[str],
 ) -> list[Task]:
+    return [
+        build_personality_task(agents, task_configs, output_dir, platform)
+        for platform in platforms
+    ]
+
+
+def build_personality_task(
+    agents: dict[str, Agent],
+    task_configs: dict[str, dict[str, str]],
+    output_dir: Path,
+    platform: str,
+) -> Task:
     personality_config = task_configs["personality"]
-    tasks: list[Task] = []
+    output_path = output_dir / f"{platform}.txt"
+    post_text = read_required_text(
+        output_path,
+        f"{platform} platform output for personality styling",
+    )
 
-    for platform in platforms:
-        output_path = output_dir / f"{platform}.txt"
-        post_text = read_required_text(
-            output_path,
-            f"{platform} platform output for personality styling",
-        )
+    display_name = task_configs.get(platform, {}).get("display_name", platform.title())
+    description = personality_config["description_template"].format(
+        post_text=post_text,
+        display_name=display_name,
+        platform=platform,
+    )
+    expected_output = personality_config["expected_output"].format(display_name=display_name)
 
-        display_name = task_configs.get(platform, {}).get("display_name", platform.title())
-        description = personality_config["description_template"].format(
-            post_text=post_text,
-            display_name=display_name,
-            platform=platform,
-        )
-        expected_output = personality_config["expected_output"].format(display_name=display_name)
-
-        tasks.append(
-            Task(
-                description=description,
-                expected_output=expected_output,
-                agent=agents["personality"],
-            )
-        )
-
-    return tasks
+    return Task(
+        description=description,
+        expected_output=expected_output,
+        agent=agents["personality"],
+    )
 
 
 def process_transcript(
@@ -248,21 +262,48 @@ def process_transcript(
     output_dir = output_root / artwork_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    if not dry_run and output_dir_complete(output_dir, platforms):
+    base_complete = outputs_complete(base_output_paths(output_dir, platforms))
+    personality_complete = outputs_complete(personality_output_paths(output_dir, platforms))
+
+    if not dry_run and base_complete and personality_complete:
         print(f"Skipping {transcript_path} (outputs already present).")
         return
 
     if dry_run:
         output_paths = build_output_paths(output_dir, platforms)
+        personality_paths = build_personality_output_paths(output_dir, platforms)
         print(f"[Dry run] Would write outputs to {output_dir}")
         for platform, path in output_paths.items():
             print(f"  - {platform}: {path}")
         print(f"  - transcript_analysis: {transcript_analysis_path(output_dir)}")
         print(f"  - tags: {tags_output_path(output_dir)}")
-        print("  - personality: would rewrite each platform caption after generation")
+        for platform, path in personality_paths.items():
+            print(f"  - personality/{platform}: {path}")
         return
 
     agents = build_agents(llm, config_dir, platforms)
+
+    if base_complete and not personality_complete:
+        # Only run the personality pass when base captions already exist.
+        personality_tasks = build_personality_tasks(agents, task_configs, output_dir, platforms)
+        personality_dir = personality_output_dir(output_dir)
+        personality_dir.mkdir(parents=True, exist_ok=True)
+        personality_crew = Crew(
+            agents=[agents["personality"]],
+            tasks=personality_tasks,
+            process=Process.sequential,
+            verbose=True,
+        )
+        personality_crew.kickoff()
+        for platform, task in zip(platforms, personality_tasks, strict=True):
+            persist_task_output(
+                task,
+                personality_dir / f"{platform}.txt",
+                f"{platform} personality output",
+            )
+        normalize_personality_outputs(output_dir, platforms)
+        return
+
     # Step 2: analyze transcript into a structured extraction.
     transcript_task = build_transcript_task(agents, task_configs, transcript_text, output_dir)
     transcript_crew = Crew(
@@ -317,6 +358,8 @@ def process_transcript(
 
     # Step 5: apply personality styling to each platform caption.
     personality_tasks = build_personality_tasks(agents, task_configs, output_dir, platforms)
+    personality_dir = personality_output_dir(output_dir)
+    personality_dir.mkdir(parents=True, exist_ok=True)
     personality_crew = Crew(
         agents=[agents["personality"]],
         tasks=personality_tasks,
@@ -327,7 +370,7 @@ def process_transcript(
     for platform, task in zip(platforms, personality_tasks, strict=True):
         persist_task_output(
             task,
-            output_dir / f"{platform}.txt",
+            personality_dir / f"{platform}.txt",
             f"{platform} personality output",
         )
     normalize_personality_outputs(output_dir, platforms)

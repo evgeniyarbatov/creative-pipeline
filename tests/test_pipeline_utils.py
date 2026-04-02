@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from pipeline_utils import build_output_paths, derive_artwork_name
+from pipeline_utils import build_output_paths, build_personality_output_paths, derive_artwork_name, personality_output_dir
 
 
 def test_derive_artwork_name():
@@ -22,3 +22,10 @@ def test_build_output_paths():
     assert paths["facebook"] == output_dir / "facebook.txt"
     assert paths["instagram"] == output_dir / "instagram.txt"
 
+
+def test_build_personality_output_paths():
+    output_dir = Path("/tmp/output")
+    paths = build_personality_output_paths(output_dir, ["facebook", "instagram"])
+    base_dir = personality_output_dir(output_dir)
+    assert paths["facebook"] == base_dir / "facebook.txt"
+    assert paths["instagram"] == base_dir / "instagram.txt"

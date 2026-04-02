@@ -2,7 +2,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from captions_pipeline import output_dir_complete, output_text_ready, persist_task_output, write_output_file
+from captions_pipeline import (
+    base_output_paths,
+    output_text_ready,
+    outputs_complete,
+    persist_task_output,
+    personality_output_paths,
+    write_output_file,
+)
+from pipeline_utils import personality_output_dir
 from task_config import TaskConfigError
 
 
@@ -45,20 +53,30 @@ def test_output_text_ready_false_for_missing_file(tmp_path):
     assert output_text_ready(output_path) is False
 
 
-def test_output_dir_complete_true_when_all_outputs_present(tmp_path):
+def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
     (output_dir / "transcript_analysis.txt").write_text("analysis", encoding="utf-8")
     (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
     (output_dir / "instagram.txt").write_text("caption", encoding="utf-8")
 
-    assert output_dir_complete(output_dir, ["instagram"]) is True
+    assert outputs_complete(base_output_paths(output_dir, ["instagram"])) is True
 
 
-def test_output_dir_complete_false_when_any_output_missing(tmp_path):
+def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
     (output_dir / "transcript_analysis.txt").write_text("analysis", encoding="utf-8")
     (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
 
-    assert output_dir_complete(output_dir, ["instagram"]) is False
+    assert outputs_complete(base_output_paths(output_dir, ["instagram"])) is False
+
+
+def test_outputs_complete_personality_outputs(tmp_path):
+    output_dir = tmp_path / "artwork"
+    output_dir.mkdir()
+    personality_dir = personality_output_dir(output_dir)
+    personality_dir.mkdir(parents=True, exist_ok=True)
+    (personality_dir / "instagram.txt").write_text("styled caption", encoding="utf-8")
+
+    assert outputs_complete(personality_output_paths(output_dir, ["instagram"])) is True

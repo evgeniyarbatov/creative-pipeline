@@ -10,6 +10,10 @@ For each transcript in `~/Documents/art-talks/*.txt`, the pipeline creates:
 - `~/Documents/art-talks/<artwork-name>/instagram.txt`
 - `~/Documents/art-talks/<artwork-name>/deviantart.txt`
 - `~/Documents/art-talks/<artwork-name>/pinterest.txt`
+- `~/Documents/art-talks/<artwork-name>/personality/facebook.txt`
+- `~/Documents/art-talks/<artwork-name>/personality/instagram.txt`
+- `~/Documents/art-talks/<artwork-name>/personality/deviantart.txt`
+- `~/Documents/art-talks/<artwork-name>/personality/pinterest.txt`
 - `~/Documents/art-talks/<artwork-name>/tags.txt` (shared tags for all platforms)
 - `~/Documents/art-talks/<artwork-name>/transcript_analysis.txt` (structured extraction used downstream)
 
@@ -30,9 +34,9 @@ For each transcript, the execution flow is:
 2. Analyze transcript and extract using `agents/transcript.yaml`.
 3. Run the tags task to generate reusable tags.
 4. Run each platform task to produce a base caption using the analyzed transcript as input.
-5. Run the personality styling task to rewrite each platform caption.
+5. Run the personality styling task to rewrite each platform caption into `personality/`.
 
-Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt` and `transcript_analysis.txt`.
+Outputs are written into `~/Documents/art-talks/<artwork-name>/` with one file per platform plus `tags.txt` and `transcript_analysis.txt`. Personality-styled captions land in `~/Documents/art-talks/<artwork-name>/personality/`.
 
 ## Prerequisites
 
