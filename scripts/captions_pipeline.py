@@ -93,7 +93,7 @@ def get_llm(model_name: str, base_url: str | None):
     try:
         from crewai import LLM
 
-        kwargs = {"options": options}
+        kwargs = {"extra_body": {"options": options}}
         if base_url:
             kwargs["base_url"] = base_url
         return LLM(model=f"ollama/{model_name}", **kwargs)

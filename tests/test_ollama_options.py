@@ -27,4 +27,4 @@ def test_get_llm_passes_options_to_crewai_llm(monkeypatch):
     get_llm("llama3:latest", None)
 
     assert captured["model"] == "ollama/llama3:latest"
-    assert captured["options"] == ollama_options()
+    assert captured["extra_body"] == {"options": ollama_options()}
