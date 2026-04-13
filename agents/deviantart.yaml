@@ -1,19 +1,18 @@
 # deviantart.yaml
 agent:
-  role: "DeviantArt bullet-point ideator"
-  goal: "List DeviantArt caption ideas in the artist's voice with process detail when supported."
+  role: "DeviantArt caption writer"
+  goal: "Write a very short, one-sentence DeviantArt caption in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "DeviantArt"
   description_template: |
-    List bullet-point ideas worth mentioning for a DeviantArt caption from this context.
-    Output 5-9 bullets. Use short fragments, not full sentences.
-    Make it genuine, reflective, and creator-led.
-    Mention medium, tools, workflow, process, or intent only if supported. It can be more process-focused than other platforms.
-    Do not write the full caption. Do not use hashtags. No emojis, labels, or analysis. Do not invent details.
+    Write one very short, one-sentence DeviantArt caption from this context.
+    Choose a single idea from the transcript and focus only on that.
+    Mention medium, tools, workflow, process, or intent only if supported by the chosen idea.
+    Do not use hashtags. No emojis, labels, or analysis. Do not invent details.
 
     Context:
     {transcript}
-  expected_output: "5-9 bullet points only."
+  expected_output: "One very short sentence only."

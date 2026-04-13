@@ -1,19 +1,19 @@
 # pinterest.yaml
 agent:
-  role: "Pinterest bullet-point ideator"
-  goal: "List searchable Pinterest caption ideas in the artist's voice."
+  role: "Pinterest caption writer"
+  goal: "Write a very short, one-sentence Pinterest caption in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "Pinterest"
   description_template: |
-    List bullet-point ideas worth mentioning for a Pinterest caption from this context.
-    Output 4-7 bullets. Use short fragments, not full sentences.
+    Write one very short, one-sentence Pinterest caption from this context.
+    Choose a single idea from the transcript and focus only on that.
     Lead with subject + medium when known. Keep it clear, searchable, and natural.
-    Mention style, mood, or use-case only if supported.
-    Do not write the full caption. Do not use hashtags. No emojis, labels, quotes, or analysis. Do not invent details.
+    Mention style, mood, or use-case only if supported by the chosen idea.
+    Do not use hashtags. No emojis, labels, quotes, or analysis. Do not invent details.
 
     Context:
     {transcript}
-  expected_output: "4-7 bullet points only."
+  expected_output: "One very short sentence only."
