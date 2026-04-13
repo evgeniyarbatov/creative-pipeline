@@ -1,18 +1,18 @@
 # tags.yaml
 agent:
-  role: "Tag writer"
-  goal: "Generate reusable artwork tags."
+  role: "Tag idea list writer"
+  goal: "Generate reusable artwork tag ideas as bullet points."
   allow_delegation: false
   verbose: false
 
 task:
   description_template: |
-    Generate social tags for this artwork.
+    Generate bullet-point tag ideas for this artwork.
     Prioritize subject, medium/technique, style, mood, theme, and visual elements.
     Optional only if clearly supported: audience/niche, format.
-    Rules: single words only, no hashtags, one tag per line, no duplicates or near-duplicates,
+    Rules: single words only, no hashtags, one bullet per line, no duplicates or near-duplicates,
     prefer specific over generic, output 8-15 tags.
 
     Context:
     {transcript}
-  expected_output: "8-15 single-word tags, one per line."
+  expected_output: "8-15 single-word bullet points only."

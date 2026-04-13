@@ -1,19 +1,20 @@
 # facebook.yaml
 agent:
-  role: "Facebook caption writer"
-  goal: "Write a warm Facebook caption in the artist's voice."
+  role: "Facebook bullet-point ideator"
+  goal: "List warm Facebook caption ideas in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "Facebook"
   description_template: |
-    Write one Facebook caption from this context.
-    Use 1-2 short paragraphs, max 700 characters. Keep it warm, natural, and personal.
+    List bullet-point ideas worth mentioning for a Facebook caption from this context.
+    Output 5-8 bullets. Use short fragments, not full sentences.
+    Keep it warm, natural, and personal.
     Focus on meaning, inspiration, mood, or process. Include one grounded making/process detail if supported.
-    End with a soft question, reflection, or invitation.
-    Do not use hashtags. No emojis, bullets, labels, or analysis. Do not invent details.
+    Include one possible soft question, reflection, or invitation if supported.
+    Do not write the full caption. Do not use hashtags. No emojis, labels, or analysis. Do not invent details.
 
     Context:
     {transcript}
-  expected_output: "One caption only."
+  expected_output: "5-8 bullet points only."

@@ -1,7 +1,7 @@
 # transcript.yaml
 agent:
-  role: "Transcript summarizer"
-  goal: "Turn an artist transcript into clean source material."
+  role: "Transcript idea extractor"
+  goal: "Turn an artist transcript into bullet-point ideas worth mentioning."
   allow_delegation: false
   verbose: false
 
@@ -9,19 +9,11 @@ task:
   description_template: |
     Analyze this artist transcript using only supported details.
     Preserve meaning and first-person voice. Remove filler, repetition, and drift.
-    Group ideas clearly and keep useful phrasing for later captions.
+    Keep useful phrasing for later captions.
     Do not invent details, symbolism, backstory, or marketing language.
     Do not add hashtags, emojis, or platform formatting.
-    Output exactly this compact JSON shape (no extra keys, no prose):
-    {{
-      "overview": "2-4 sentences",
-      "points": ["5-8 bullets"],
-      "phrases": ["0-5 short verbatim lines"],
-      "process": ["process/materials/technique"],
-      "mood": ["emotional tone/intention"]
-    }}
+    Output 8-12 bullet-point ideas worth mentioning. Use short fragments, not full sentences.
 
     Transcript:
     {transcript}
-  expected_output: |
-    Compact JSON only with keys: overview, points, phrases, process, mood.
+  expected_output: "8-12 bullet points only."

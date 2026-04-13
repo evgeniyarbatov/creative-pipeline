@@ -4,11 +4,11 @@
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=llama&logoColor=white)
 ![CrewAI](https://img.shields.io/badge/CrewAI-Multi--Agent%20AI-purple)
 
-Generate platform-specific social captions from transcript files using CrewAI + Ollama.
+Generate platform-specific bullet-point caption ideas from transcript files using CrewAI + Ollama.
 
 ## Examples
 
-See sample output in `examples/`.
+See sample bullet-point outputs in `examples/`.
 
 ## Quick Start
 

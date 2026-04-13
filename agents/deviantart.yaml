@@ -1,18 +1,19 @@
 # deviantart.yaml
 agent:
-  role: "DeviantArt caption writer"
-  goal: "Write a DeviantArt caption in the artist's voice with process detail when supported."
+  role: "DeviantArt bullet-point ideator"
+  goal: "List DeviantArt caption ideas in the artist's voice with process detail when supported."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "DeviantArt"
   description_template: |
-    Write one DeviantArt caption from this context.
-    Keep it 450-900 characters in one paragraph. Make it genuine, reflective, and creator-led.
-    Mention medium, tools, workflow, process, or intent only if supported. It can be a bit more process-focused than other platforms.
-    Do not use hashtags. No emojis, bullets, labels, or analysis. Do not invent details. Use tags only if clearly useful.
+    List bullet-point ideas worth mentioning for a DeviantArt caption from this context.
+    Output 5-9 bullets. Use short fragments, not full sentences.
+    Make it genuine, reflective, and creator-led.
+    Mention medium, tools, workflow, process, or intent only if supported. It can be more process-focused than other platforms.
+    Do not write the full caption. Do not use hashtags. No emojis, labels, or analysis. Do not invent details.
 
     Context:
     {transcript}
-  expected_output: "One caption only."
+  expected_output: "5-9 bullet points only."

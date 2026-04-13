@@ -1,19 +1,20 @@
 # instagram.yaml
 agent:
-  role: "Instagram caption writer"
-  goal: "Write a compact Instagram caption in the artist's voice."
+  role: "Instagram bullet-point ideator"
+  goal: "List concise Instagram caption ideas in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "Instagram"
   description_template: |
-    Write one Instagram caption from this context.
-    Use 2-4 short lines, 350-700 characters. Keep it vivid, intimate, and artist-led.
+    List bullet-point ideas worth mentioning for an Instagram caption from this context.
+    Output 5-8 bullets. Use short fragments, not full sentences.
+    Keep it vivid, intimate, and artist-led.
     Emphasize mood, texture, color, process, or one memorable detail.
-    End on a sensory or emotional note.
-    Do not use hashtags. No labels, quotes, or analysis. Do not invent details.
+    Include a sensory or emotional note if supported.
+    Do not write the full caption. Do not use hashtags. No labels, quotes, or analysis. Do not invent details.
 
     Context:
     {transcript}
-  expected_output: "One caption only."
+  expected_output: "5-8 bullet points only."

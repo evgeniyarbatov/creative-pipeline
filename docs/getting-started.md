@@ -1,6 +1,6 @@
 # Getting Started
 
-This pipeline generates social captions from transcript `.txt` files using CrewAI + Ollama.
+This pipeline generates bullet-point caption ideas from transcript `.txt` files using CrewAI + Ollama.
 
 ## Add Transcripts
 
@@ -24,7 +24,7 @@ By default, outputs are written under `~/Documents/art-talks/<artwork-name>/`.
 
 ## Outputs
 
-Per transcript, the pipeline creates:
+Per transcript, the pipeline creates bullet-point idea lists:
 
 - `~/Documents/art-talks/<artwork-name>/facebook.txt`
 - `~/Documents/art-talks/<artwork-name>/instagram.txt`
@@ -35,8 +35,8 @@ Per transcript, the pipeline creates:
 - `~/Documents/art-talks/<artwork-name>/personality/deviantart.txt`
 - `~/Documents/art-talks/<artwork-name>/personality/pinterest.txt`
 - `~/Documents/art-talks/<artwork-name>/tags.txt`
-- `~/Documents/art-talks/<artwork-name>/transcript_analysis.json`
+- `~/Documents/art-talks/<artwork-name>/transcript_analysis.json` (bullet points, despite the extension)
 
 ## Data Notes
 
-Transcripts and generated captions live outside the repo.
+Transcripts and generated bullet-point outputs live outside the repo.

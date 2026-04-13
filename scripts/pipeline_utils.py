@@ -34,6 +34,7 @@ def build_personality_output_paths(
 
 
 HASHTAG_RE = re.compile(r"(?<!\w)#(?=\w*[A-Za-z])\w+")
+BULLET_PREFIX_RE = re.compile(r"^(?:[-*•]+|\d+[.)])\s*")
 
 
 def strip_hashtags(text: str) -> str:
@@ -55,6 +56,7 @@ def normalize_tags_output(output_path: Path) -> None:
         tag = line.strip()
         if not tag:
             continue
+        tag = BULLET_PREFIX_RE.sub("", tag)
         tag = re.sub(r"^#+", "", tag)
         tag = tag.strip(" \t.,;:!?\"'()[]{}")
         if not tag:
@@ -70,7 +72,7 @@ def normalize_tags_output(output_path: Path) -> None:
     if not tags:
         raise TaskConfigError(f"Tags output contained no usable tags: {output_path}")
 
-    output_path.write_text("\n".join(tags), encoding="utf-8")
+    output_path.write_text("\n".join(f"- {tag}" for tag in tags), encoding="utf-8")
 
 
 def normalize_personality_outputs(output_dir: Path, platforms: Iterable[str]) -> None:
