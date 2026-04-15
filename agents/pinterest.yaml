@@ -1,14 +1,14 @@
 # pinterest.yaml
 agent:
   role: "Pinterest caption writer"
-  goal: "Write a very short, one-sentence Pinterest caption in the artist's voice."
+  goal: "Write a very short, 2-3 sentence Pinterest caption in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "Pinterest"
   description_template: |
-    Write one very short, one-sentence Pinterest caption from this context.
+    Write one very short, 2-3 sentence Pinterest caption from this context.
     Choose a single idea from the transcript and focus only on that.
     Lead with subject + medium when known. Keep it clear, searchable, and natural.
     Mention style, mood, or use-case only if supported by the chosen idea.
@@ -16,4 +16,4 @@ task:
 
     Context:
     {transcript}
-  expected_output: "One very short sentence only."
+  expected_output: "2-3 very short sentences only."

@@ -1,18 +1,18 @@
 # deviantart.yaml
 agent:
   role: "DeviantArt caption writer"
-  goal: "Write a very short, one-sentence DeviantArt caption in the artist's voice."
+  goal: "Write a very short, 2-3 sentence DeviantArt caption in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "DeviantArt"
   description_template: |
-    Write one very short, one-sentence DeviantArt caption from this context.
+    Write one very short, 2-3 sentence DeviantArt caption from this context.
     Choose a single idea from the transcript and focus only on that.
     Mention medium, tools, workflow, process, or intent only if supported by the chosen idea.
     Do not use hashtags. No emojis, labels, or analysis. Do not invent details.
 
     Context:
     {transcript}
-  expected_output: "One very short sentence only."
+  expected_output: "2-3 very short sentences only."

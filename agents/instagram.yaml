@@ -1,18 +1,18 @@
 # instagram.yaml
 agent:
   role: "Instagram caption writer"
-  goal: "Write a very short, one-sentence Instagram caption in the artist's voice."
+  goal: "Write a very short, 2-3 sentence Instagram caption in the artist's voice."
   allow_delegation: false
   verbose: false
 
 task:
   display_name: "Instagram"
   description_template: |
-    Write one very short, one-sentence Instagram caption from this context.
+    Write one very short, 2-3 sentence Instagram caption from this context.
     Choose a single idea from the transcript and focus only on that.
     Keep it vivid, intimate, and artist-led, but do not add any extra ideas.
     Do not use hashtags. No labels, quotes, or analysis. Do not invent details.
 
     Context:
     {transcript}
-  expected_output: "One very short sentence only."
+  expected_output: "2-3 very short sentences only."
