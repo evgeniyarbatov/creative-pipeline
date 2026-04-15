@@ -8,10 +8,8 @@ from captions_pipeline import (
     output_text_ready,
     outputs_complete,
     persist_task_output,
-    personality_output_paths,
     write_output_file,
 )
-from pipeline_utils import personality_output_dir
 from task_config import TaskConfigError
 
 
@@ -73,20 +71,9 @@ def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
     assert outputs_complete(base_output_paths(output_dir, ["instagram"])) is False
 
 
-def test_outputs_complete_personality_outputs(tmp_path):
-    output_dir = tmp_path / "artwork"
-    output_dir.mkdir()
-    personality_dir = personality_output_dir(output_dir)
-    personality_dir.mkdir(parents=True, exist_ok=True)
-    (personality_dir / "instagram.txt").write_text("styled caption", encoding="utf-8")
-
-    assert outputs_complete(personality_output_paths(output_dir, ["instagram"])) is True
-
-
 def test_discover_platforms_ignores_non_platform_configs(tmp_path):
     (tmp_path / "transcript.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
     (tmp_path / "tags.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-    (tmp_path / "personality.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
     (tmp_path / "instagram.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
     (tmp_path / "facebook.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
 
@@ -96,7 +83,6 @@ def test_discover_platforms_ignores_non_platform_configs(tmp_path):
 def test_discover_platforms_requires_at_least_one_platform(tmp_path):
     (tmp_path / "transcript.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
     (tmp_path / "tags.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-    (tmp_path / "personality.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
 
     with pytest.raises(SystemExit):
         discover_platforms(tmp_path)

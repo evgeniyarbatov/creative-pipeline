@@ -30,10 +30,6 @@ Per transcript, the pipeline creates bullet-point idea lists:
 - `~/Documents/art-talks/<artwork-name>/instagram.txt`
 - `~/Documents/art-talks/<artwork-name>/deviantart.txt`
 - `~/Documents/art-talks/<artwork-name>/pinterest.txt`
-- `~/Documents/art-talks/<artwork-name>/personality/facebook.txt`
-- `~/Documents/art-talks/<artwork-name>/personality/instagram.txt`
-- `~/Documents/art-talks/<artwork-name>/personality/deviantart.txt`
-- `~/Documents/art-talks/<artwork-name>/personality/pinterest.txt`
 - `~/Documents/art-talks/<artwork-name>/tags.txt`
 - `~/Documents/art-talks/<artwork-name>/transcript_analysis.json` (bullet points, despite the extension)
 

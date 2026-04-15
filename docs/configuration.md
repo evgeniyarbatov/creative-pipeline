@@ -10,7 +10,6 @@ Configs live in `agents/` and contain two sections:
 Included configs:
 
 - `agents/transcript.yaml`
-- `agents/personality.yaml`
 - `agents/tags.yaml`
 - `agents/facebook.yaml`
 - `agents/instagram.yaml`
