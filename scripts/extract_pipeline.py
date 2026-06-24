@@ -10,14 +10,23 @@ from crewai import Agent, Crew, Process, Task
 
 from agent_config import AgentConfigError, load_agent_config
 from task_config import TaskConfigError, load_task_config
+from memory_schema import MemorySchemaError, parse_memory_payload, render_memory_markdown
 from pipeline_utils import (
     derive_artwork_name,
     normalize_tags_output,
 )
 
-TRANSCRIPT_ANALYSIS_FILENAME = "transcript_analysis.json"
+MEMORY_FILENAME = "memory.json"
+MEMORY_MD_FILENAME = "memory.md"
 TAGS_FILENAME = "tags.txt"
-OLLAMA_OPTIONS = {
+
+EXTRACTION_OPTIONS = {
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "repeat_penalty": 1.1,
+    "num_predict": 1024,
+}
+DERIVATION_OPTIONS = {
     "temperature": 0.4,
     "top_p": 0.85,
     "repeat_penalty": 1.15,
@@ -25,16 +34,24 @@ OLLAMA_OPTIONS = {
 }
 
 
-def transcript_analysis_path(output_dir: Path) -> Path:
-    return output_dir / TRANSCRIPT_ANALYSIS_FILENAME
+def memory_path(output_dir: Path) -> Path:
+    return output_dir / MEMORY_FILENAME
+
+
+def memory_md_path(output_dir: Path) -> Path:
+    return output_dir / MEMORY_MD_FILENAME
 
 
 def tags_output_path(output_dir: Path) -> Path:
     return output_dir / TAGS_FILENAME
 
 
-def ollama_options() -> dict[str, float | int]:
-    return dict(OLLAMA_OPTIONS)
+def extraction_options() -> dict[str, float | int]:
+    return dict(EXTRACTION_OPTIONS)
+
+
+def derivation_options() -> dict[str, float | int]:
+    return dict(DERIVATION_OPTIONS)
 
 
 def output_text_ready(path: Path) -> bool:
@@ -48,7 +65,8 @@ def output_text_ready(path: Path) -> bool:
 
 def base_output_paths(output_dir: Path, platforms: Iterable[str]) -> list[Path]:
     return [
-        transcript_analysis_path(output_dir),
+        memory_path(output_dir),
+        memory_md_path(output_dir),
         tags_output_path(output_dir),
         *[output_dir / f"{platform}.txt" for platform in platforms],
     ]
@@ -82,8 +100,24 @@ def persist_task_output(task: Task, output_path: Path, label: str) -> None:
     write_output_file(output_path, task.output.raw)
 
 
-def get_llm(model_name: str, base_url: str | None):
-    options = ollama_options()
+def persist_memory_output(
+    task: Task, output_dir: Path, artwork_name: str
+) -> None:
+    if task.output is None:
+        raise TaskConfigError(f"Missing memory output: {memory_path(output_dir)}")
+    try:
+        memory = parse_memory_payload(task.output.raw)
+    except MemorySchemaError as exc:
+        raise TaskConfigError(
+            f"Malformed memory output for {artwork_name}: {exc}"
+        ) from exc
+    write_output_file(memory_path(output_dir), memory)
+    write_output_file(
+        memory_md_path(output_dir), render_memory_markdown(memory, artwork_name)
+    )
+
+
+def get_llm(model_name: str, base_url: str | None, options: dict[str, float | int]):
     try:
         from crewai import LLM
 
@@ -103,18 +137,23 @@ def get_llm(model_name: str, base_url: str | None):
         return Ollama(model=model_name, **kwargs)
 
 
-def build_agents(llm, config_dir: Path, platforms: Iterable[str]) -> dict[str, Agent]:
-    def build_agent(name: str) -> Agent:
+def build_agents(
+    extraction_llm,
+    derivation_llm,
+    config_dir: Path,
+    platforms: Iterable[str],
+) -> dict[str, Agent]:
+    def build_agent(name: str, llm) -> Agent:
         config = load_agent_config(config_dir / f"{name}.yaml")
         return Agent(**config, llm=llm)
 
     agents: dict[str, Agent] = {
-        "transcript": build_agent("transcript"),
-        "tags": build_agent("tags"),
+        "transcript": build_agent("transcript", extraction_llm),
+        "tags": build_agent("tags", derivation_llm),
     }
 
     for platform in platforms:
-        agents[platform] = build_agent(platform)
+        agents[platform] = build_agent(platform, derivation_llm)
 
     return agents
 
@@ -166,14 +205,14 @@ def build_transcript_task(
 def build_tags_task(
     agents: dict[str, Agent],
     task_configs: dict[str, dict[str, str]],
-    transcript_analysis: str,
+    memory_context: str,
     output_dir: Path,
 ) -> Task:
     tags_config = task_configs["tags"]
     return Task(
         description=(
             tags_config["description_template"].format(
-                transcript=transcript_analysis,
+                transcript=memory_context,
             )
         ),
         expected_output=tags_config["expected_output"],
@@ -185,7 +224,7 @@ def build_tags_task(
 def build_platform_tasks(
     agents: dict[str, Agent],
     task_configs: dict[str, dict[str, str]],
-    transcript_analysis: str,
+    memory_context: str,
     tag_task: Task,
     output_dir: Path,
     platforms: Iterable[str],
@@ -197,7 +236,7 @@ def build_platform_tasks(
         output_path = output_dir / f"{platform}.txt"
         description = config["description_template"].format(
             display_name=display_name,
-            transcript=transcript_analysis,
+            transcript=memory_context,
         )
         style_rules = config.get("style_rules")
         if style_rules:
@@ -220,7 +259,8 @@ def process_transcript(
     transcript_path: Path,
     output_root: Path,
     platforms: Iterable[str],
-    llm,
+    extraction_llm,
+    derivation_llm,
     config_dir: Path,
     task_configs: dict[str, dict[str, str]],
 ) -> None:
@@ -237,9 +277,9 @@ def process_transcript(
         print(f"Skipping {transcript_path} (outputs already present).")
         return
 
-    agents = build_agents(llm, config_dir, platforms)
+    agents = build_agents(extraction_llm, derivation_llm, config_dir, platforms)
 
-    # Step 2: analyze transcript into a structured extraction.
+    # Step 2: extract a structured memory from the transcript.
     transcript_task = build_transcript_task(agents, task_configs, transcript_text, output_dir)
     transcript_crew = Crew(
         agents=[agents["transcript"]],
@@ -248,19 +288,12 @@ def process_transcript(
         verbose=True,
     )
     transcript_crew.kickoff()
-    persist_task_output(
-        transcript_task,
-        transcript_analysis_path(output_dir),
-        "transcript analysis",
-    )
+    persist_memory_output(transcript_task, output_dir, artwork_name)
 
-    transcript_analysis = read_required_text(
-        transcript_analysis_path(output_dir),
-        "transcript analysis",
-    )
+    memory_context = read_required_text(memory_md_path(output_dir), "memory")
 
-    # Step 3: generate tags.
-    tag_task = build_tags_task(agents, task_configs, transcript_analysis, output_dir)
+    # Step 3: generate tags (legacy, opt-in derivation).
+    tag_task = build_tags_task(agents, task_configs, memory_context, output_dir)
 
     tags_crew = Crew(
         agents=[agents["tags"]],
@@ -276,12 +309,12 @@ def process_transcript(
     )
     normalize_tags_output(tags_output_path(output_dir))
 
-    # Step 4: generate per-platform captions.
+    # Step 4: generate per-platform captions (legacy, opt-in derivation).
     for platform in platforms:
         platform_tasks = build_platform_tasks(
             agents,
             task_configs,
-            transcript_analysis,
+            memory_context,
             tag_task,
             output_dir,
             [platform],
@@ -302,7 +335,7 @@ def process_transcript(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate social captions from art transcripts.")
+    parser = argparse.ArgumentParser(description="Extract artist memory from art transcripts.")
     default_config_dir = str(Path(__file__).resolve().parents[1] / "agents")
     parser.add_argument(
         "--transcripts-dir",
@@ -331,7 +364,7 @@ def main() -> None:
         "--platforms",
         nargs="+",
         default=None,
-        help="Platforms to generate (default: all configs in the config dir).",
+        help="Legacy platform captions to also generate (default: all configs in the config dir).",
     )
     parser.add_argument(
         "--config-dir",
@@ -356,7 +389,8 @@ def main() -> None:
 
     output_root = Path(args.output_dir).expanduser() if args.output_dir else transcripts_dir
 
-    llm = get_llm(args.model, args.ollama_base_url)
+    extraction_llm = get_llm(args.model, args.ollama_base_url, extraction_options())
+    derivation_llm = get_llm(args.model, args.ollama_base_url, derivation_options())
     override_dirs = [value for value in (args.agents_dir, args.tasks_dir) if value]
     if override_dirs:
         if len(set(override_dirs)) > 1:
@@ -388,13 +422,14 @@ def main() -> None:
     for transcript_path in transcript_files:
         try:
             process_transcript(
-            transcript_path,
-            output_root,
-            platforms,
-            llm,
-            configs_dir,
-            task_configs,
-        )
+                transcript_path,
+                output_root,
+                platforms,
+                extraction_llm,
+                derivation_llm,
+                configs_dir,
+                task_configs,
+            )
         except (AgentConfigError, TaskConfigError) as exc:
             raise SystemExit(str(exc)) from exc
 

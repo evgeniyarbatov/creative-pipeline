@@ -1,19 +1,35 @@
 # transcript.yaml
 agent:
-  role: "Transcript idea extractor"
-  goal: "Turn an artist transcript into bullet-point ideas worth mentioning."
+  role: "Transcript memory keeper"
+  goal: "Turn an artist transcript into a structured memory that preserves voice, contradiction, and uncertainty."
   allow_delegation: false
   verbose: false
 
 task:
   description_template: |
-    Analyze this artist transcript using only supported details.
-    Preserve meaning and first-person voice. Remove filler, repetition, and drift.
-    Keep useful phrasing for later captions.
-    Do not invent details, symbolism, backstory, or marketing language.
-    Do not add hashtags, emojis, or platform formatting.
-    Output 8-12 bullet-point ideas worth mentioning. Use short fragments, not full sentences.
+    Extract a structured memory from this artist transcript. Use only what is in the transcript.
+
+    Rules:
+    - Pull direct quotes wherever possible. Prefer the artist's exact phrasing over paraphrase.
+    - Label each thread's status as "resolved", "unresolved", or "abandoned".
+    - If the artist says two incompatible things, record both sides as a contradiction. Do not pick one or reconcile them.
+    - Keep repetition when it signals emphasis (e.g. "I really, really wanted...").
+    - Allow longer, run-on fragments that match how the artist actually spoke.
+    - Keep hesitation and uncertainty ("I think", "maybe", "not sure") rather than smoothing it into a confident statement.
+    - Do not invent details, symbolism, backstory, or marketing language.
+    - Do not add hashtags, emojis, or platform formatting.
+
+    Output ONLY a single JSON object with exactly these keys, and nothing else (no markdown fences, no prose before or after):
+
+    {{
+      "source": {{"filename": "<artwork name>", "recorded_approx": null}},
+      "threads": [{{"label": "...", "status": "resolved|unresolved|abandoned", "notes": ["..."], "quotes": ["..."]}}],
+      "contradictions": [{{"a": "...", "b": "...", "context": "..."}}],
+      "tangents": [{{"quote": "...", "relation": "..."}}],
+      "open_questions": ["..."],
+      "anchors": [{{"quote": "...", "why_it_matters": "..."}}]
+    }}
 
     Transcript:
     {transcript}
-  expected_output: "8-12 bullet points only."
+  expected_output: "Valid JSON only, matching the memory schema (source, threads, contradictions, tangents, open_questions, anchors). No prose, no markdown fences."

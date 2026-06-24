@@ -1,0 +1,52 @@
+{
+  "source": {
+    "filename": "bamboo-forest.txt",
+    "recorded_approx": null
+  },
+  "threads": [
+    {
+      "label": "disorientation vs scale",
+      "status": "unresolved",
+      "notes": [
+        "dense bamboo blocked everything out, felt lost",
+        "felt like the whole earth was just that one hill"
+      ],
+      "quotes": [
+        "I remember feeling kind of lost, like disoriented, like the whole earth was just that one hill and nothing else existed."
+      ]
+    },
+    {
+      "label": "wanting to hold onto the feeling",
+      "status": "unresolved",
+      "notes": [
+        "doesn't know if 'cherishing' is the right word but keeps returning to wanting to hold onto it"
+      ],
+      "quotes": [
+        "I don't know if \"cherishing\" is the right word but I keep coming back to that feeling of wanting to hold onto it"
+      ]
+    }
+  ],
+  "contradictions": [
+    {
+      "a": "it was miserable, my legs were done, I wanted to stop so bad",
+      "b": "it was the calmest part of the whole run, weirdly",
+      "context": "said back to back about the same stretch of the climb"
+    }
+  ],
+  "tangents": [
+    {
+      "quote": "There's a smell thing too — wet leaves, kind of sweet, it's been bugging me, I can't place where else I've smelled that.",
+      "relation": "unresolved sensory association, unclear if related to the drawing"
+    }
+  ],
+  "open_questions": [
+    "maybe 95, I don't actually remember the exact number — how far into the run this actually was",
+    "Might be nothing — about the wet-leaves smell"
+  ],
+  "anchors": [
+    {
+      "quote": "I drew this a few weeks after, when I was already back home, trying to get back that stillness.",
+      "why_it_matters": "stated reason for making the piece — trying to recover a feeling from the run"
+    }
+  ]
+}

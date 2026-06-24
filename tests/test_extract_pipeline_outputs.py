@@ -2,11 +2,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from captions_pipeline import (
+from extract_pipeline import (
     base_output_paths,
     discover_platforms,
     output_text_ready,
     outputs_complete,
+    persist_memory_output,
     persist_task_output,
     write_output_file,
 )
@@ -55,7 +56,8 @@ def test_output_text_ready_false_for_missing_file(tmp_path):
 def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
-    (output_dir / "transcript_analysis.json").write_text("analysis", encoding="utf-8")
+    (output_dir / "memory.json").write_text("{}", encoding="utf-8")
+    (output_dir / "memory.md").write_text("# artwork", encoding="utf-8")
     (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
     (output_dir / "instagram.txt").write_text("caption", encoding="utf-8")
 
@@ -65,7 +67,8 @@ def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
 def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
-    (output_dir / "transcript_analysis.json").write_text("analysis", encoding="utf-8")
+    (output_dir / "memory.json").write_text("{}", encoding="utf-8")
+    (output_dir / "memory.md").write_text("# artwork", encoding="utf-8")
     (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
 
     assert outputs_complete(base_output_paths(output_dir, ["instagram"])) is False
@@ -86,3 +89,28 @@ def test_discover_platforms_requires_at_least_one_platform(tmp_path):
 
     with pytest.raises(SystemExit):
         discover_platforms(tmp_path)
+
+
+def test_persist_memory_output_writes_json_and_markdown(tmp_path):
+    output_dir = tmp_path / "artwork"
+    output_dir.mkdir()
+    raw = (
+        '{"source": {"filename": "artwork.txt", "recorded_approx": null}, '
+        '"threads": [], "contradictions": [], "tangents": [], '
+        '"open_questions": [], "anchors": []}'
+    )
+    task = SimpleNamespace(output=SimpleNamespace(raw=raw))
+
+    persist_memory_output(task, output_dir, "artwork")
+
+    assert (output_dir / "memory.json").exists()
+    assert (output_dir / "memory.md").read_text(encoding="utf-8").startswith("# artwork")
+
+
+def test_persist_memory_output_raises_on_malformed_payload(tmp_path):
+    output_dir = tmp_path / "artwork"
+    output_dir.mkdir()
+    task = SimpleNamespace(output=SimpleNamespace(raw="not json"))
+
+    with pytest.raises(TaskConfigError):
+        persist_memory_output(task, output_dir, "artwork")

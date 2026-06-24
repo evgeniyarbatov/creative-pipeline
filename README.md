@@ -4,11 +4,11 @@
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=llama&logoColor=white)
 ![CrewAI](https://img.shields.io/badge/CrewAI-Multi--Agent%20AI-purple)
 
-Generate platform-specific bullet-point caption ideas from transcript files using CrewAI + Ollama.
+Extracts artist memory from raw transcripts using CrewAI + Ollama — not captions, not marketing copy. The goal is to preserve what you were thinking when you made a piece, including the parts that never resolved. See `ROADMAP.md` and `docs/philosophy.md` for the full direction.
 
 ## Examples
 
-See sample bullet-point outputs in `examples/`.
+See `examples/drawing-of-clouds` and `examples/bamboo-forest` for a messy transcript next to its `memory.json`/`memory.md` extraction — contradictions, tangents, and hedging preserved.
 
 ## Quick Start
 
@@ -37,6 +37,7 @@ make
 - Getting started and transcripts: `docs/getting-started.md`
 - Voice Memos transcript steps: `docs/transcripts.md`
 - Configuration and CLI options: `docs/configuration.md`
+- Principles behind the output format: `docs/philosophy.md`
 
 ## License
 

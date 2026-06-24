@@ -17,3 +17,5 @@ Add one `.txt` file per recording:
 5. Paste into a new file in `~/Documents/art-talks/` named `<artwork-name>.txt`.
 
 Tip: keep filenames short and descriptive. The filename becomes the output folder name.
+
+Don't clean up the transcript before saving it. Filler, repetition, contradiction, and tangents are exactly what extraction is meant to preserve — see `docs/philosophy.md`.
