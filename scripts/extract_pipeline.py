@@ -63,12 +63,11 @@ def output_text_ready(path: Path) -> bool:
         return False
 
 
-def base_output_paths(output_dir: Path, platforms: Iterable[str]) -> list[Path]:
+def base_output_paths(output_dir: Path) -> list[Path]:
     return [
         memory_path(output_dir),
         memory_md_path(output_dir),
         tags_output_path(output_dir),
-        *[output_dir / f"{platform}.txt" for platform in platforms],
     ]
 
 
@@ -141,47 +140,22 @@ def build_agents(
     extraction_llm,
     derivation_llm,
     config_dir: Path,
-    platforms: Iterable[str],
 ) -> dict[str, Agent]:
     def build_agent(name: str, llm) -> Agent:
         config = load_agent_config(config_dir / f"{name}.yaml")
         return Agent(**config, llm=llm)
 
-    agents: dict[str, Agent] = {
+    return {
         "transcript": build_agent("transcript", extraction_llm),
         "tags": build_agent("tags", derivation_llm),
     }
 
-    for platform in platforms:
-        agents[platform] = build_agent(platform, derivation_llm)
 
-    return agents
-
-
-def load_task_configs(config_dir: Path, platforms: Iterable[str]) -> dict[str, dict[str, str]]:
-    task_configs = {
+def load_task_configs(config_dir: Path) -> dict[str, dict[str, str]]:
+    return {
         "transcript": load_task_config(config_dir / "transcript.yaml"),
         "tags": load_task_config(config_dir / "tags.yaml"),
     }
-
-    for platform in platforms:
-        task_configs[platform] = load_task_config(config_dir / f"{platform}.yaml")
-
-    return task_configs
-
-
-def discover_platforms(config_dir: Path) -> list[str]:
-    excluded = {"transcript", "tags"}
-    platforms = sorted(
-        {
-            path.stem
-            for path in config_dir.glob("*.yaml")
-            if path.stem not in excluded
-        }
-    )
-    if not platforms:
-        raise SystemExit(f"No platform configs found in {config_dir}")
-    return platforms
 
 
 def build_transcript_task(
@@ -221,44 +195,9 @@ def build_tags_task(
 
 
 
-def build_platform_tasks(
-    agents: dict[str, Agent],
-    task_configs: dict[str, dict[str, str]],
-    memory_context: str,
-    tag_task: Task,
-    output_dir: Path,
-    platforms: Iterable[str],
-) -> list[Task]:
-    tasks: list[Task] = []
-    for platform in platforms:
-        config = task_configs[platform]
-        display_name = config.get("display_name", platform.title())
-        output_path = output_dir / f"{platform}.txt"
-        description = config["description_template"].format(
-            display_name=display_name,
-            transcript=memory_context,
-        )
-        style_rules = config.get("style_rules")
-        if style_rules:
-            description = f"{description}\n\nStyle rules:\n{style_rules.strip()}"
-        output_rules = config.get("output_rules")
-        if output_rules:
-            description = f"{description}\n\nOutput rules:\n{output_rules.strip()}"
-
-        tasks.append(
-            Task(
-                description=description,
-                expected_output=config["expected_output"].format(display_name=display_name),
-                agent=agents[platform],
-                context=[tag_task],
-            )
-        )
-
-    return tasks
 def process_transcript(
     transcript_path: Path,
     output_root: Path,
-    platforms: Iterable[str],
     extraction_llm,
     derivation_llm,
     config_dir: Path,
@@ -273,11 +212,11 @@ def process_transcript(
     output_dir = output_root / artwork_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    if outputs_complete(base_output_paths(output_dir, platforms)):
+    if outputs_complete(base_output_paths(output_dir)):
         print(f"Skipping {transcript_path} (outputs already present).")
         return
 
-    agents = build_agents(extraction_llm, derivation_llm, config_dir, platforms)
+    agents = build_agents(extraction_llm, derivation_llm, config_dir)
 
     # Step 2: extract a structured memory from the transcript.
     transcript_task = build_transcript_task(agents, task_configs, transcript_text, output_dir)
@@ -309,30 +248,6 @@ def process_transcript(
     )
     normalize_tags_output(tags_output_path(output_dir))
 
-    # Step 4: generate per-platform captions (legacy, opt-in derivation).
-    for platform in platforms:
-        platform_tasks = build_platform_tasks(
-            agents,
-            task_configs,
-            memory_context,
-            tag_task,
-            output_dir,
-            [platform],
-        )
-        platform_task = platform_tasks[0]
-        platform_crew = Crew(
-            agents=[agents[platform]],
-            tasks=[platform_task],
-            process=Process.sequential,
-            verbose=True,
-        )
-        platform_crew.kickoff()
-        persist_task_output(
-            platform_task,
-            output_dir / f"{platform}.txt",
-            f"{platform} caption",
-        )
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Extract artist memory from art transcripts.")
@@ -361,15 +276,9 @@ def main() -> None:
         help="Optional Ollama base URL (overrides OLLAMA_BASE_URL env var).",
     )
     parser.add_argument(
-        "--platforms",
-        nargs="+",
-        default=None,
-        help="Legacy platform captions to also generate (default: all configs in the config dir).",
-    )
-    parser.add_argument(
         "--config-dir",
         default=default_config_dir,
-        help="Directory containing per-platform YAML configs (agent + task sections).",
+        help="Directory containing the agent + task YAML configs.",
     )
     parser.add_argument(
         "--agents-dir",
@@ -405,12 +314,8 @@ def main() -> None:
     if not configs_dir.exists():
         raise SystemExit(f"Config directory not found: {configs_dir}")
 
-    if args.platforms:
-        platforms = [platform.lower() for platform in args.platforms]
-    else:
-        platforms = discover_platforms(configs_dir)
     try:
-        task_configs = load_task_configs(configs_dir, platforms)
+        task_configs = load_task_configs(configs_dir)
     except TaskConfigError as exc:
         raise SystemExit(str(exc)) from exc
 
@@ -424,7 +329,6 @@ def main() -> None:
             process_transcript(
                 transcript_path,
                 output_root,
-                platforms,
                 extraction_llm,
                 derivation_llm,
                 configs_dir,

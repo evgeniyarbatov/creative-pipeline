@@ -4,7 +4,6 @@ import pytest
 
 from extract_pipeline import (
     base_output_paths,
-    discover_platforms,
     output_text_ready,
     outputs_complete,
     persist_memory_output,
@@ -59,9 +58,8 @@ def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
     (output_dir / "memory.json").write_text("{}", encoding="utf-8")
     (output_dir / "memory.md").write_text("# artwork", encoding="utf-8")
     (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
-    (output_dir / "instagram.txt").write_text("caption", encoding="utf-8")
 
-    assert outputs_complete(base_output_paths(output_dir, ["instagram"])) is True
+    assert outputs_complete(base_output_paths(output_dir)) is True
 
 
 def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
@@ -69,26 +67,8 @@ def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
     output_dir.mkdir()
     (output_dir / "memory.json").write_text("{}", encoding="utf-8")
     (output_dir / "memory.md").write_text("# artwork", encoding="utf-8")
-    (output_dir / "tags.txt").write_text("tag1\ntag2", encoding="utf-8")
 
-    assert outputs_complete(base_output_paths(output_dir, ["instagram"])) is False
-
-
-def test_discover_platforms_ignores_non_platform_configs(tmp_path):
-    (tmp_path / "transcript.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-    (tmp_path / "tags.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-    (tmp_path / "instagram.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-    (tmp_path / "facebook.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-
-    assert discover_platforms(tmp_path) == ["facebook", "instagram"]
-
-
-def test_discover_platforms_requires_at_least_one_platform(tmp_path):
-    (tmp_path / "transcript.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-    (tmp_path / "tags.yaml").write_text("agent:\n  role: Test\n", encoding="utf-8")
-
-    with pytest.raises(SystemExit):
-        discover_platforms(tmp_path)
+    assert outputs_complete(base_output_paths(output_dir)) is False
 
 
 def test_persist_memory_output_writes_json_and_markdown(tmp_path):

@@ -24,29 +24,6 @@ task:
     assert config["expected_output"] == "Result"
 
 
-def test_load_task_config_optional_rules(tmp_path):
-    config_file = tmp_path / "platform.yaml"
-    config_file.write_text(
-        """
-agent:
-  role: "Platform"
-  goal: "Write caption"
-  backstory: "Backstory"
-task:
-  description_template: "Do thing"
-  expected_output: "Result"
-  style_rules: "Be vivid"
-  output_rules: "Return one line"
-""".strip(),
-        encoding="utf-8",
-    )
-
-    config = load_task_config(config_file)
-
-    assert config["style_rules"] == "Be vivid"
-    assert config["output_rules"] == "Return one line"
-
-
 def test_load_task_config_unknown_key(tmp_path):
     config_file = tmp_path / "transcript.yaml"
     config_file.write_text(

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Iterable
 
 from task_config import TaskConfigError
 
@@ -12,10 +11,6 @@ def derive_artwork_name(transcript_path: Path) -> str:
     if not name or (transcript_path.name.startswith(".") and transcript_path.suffix == ""):
         raise ValueError(f"Empty artwork name derived from {transcript_path}")
     return name
-
-
-def build_output_paths(output_dir: Path, platforms: Iterable[str]) -> dict[str, Path]:
-    return {platform: output_dir / f"{platform}.txt" for platform in platforms}
 
 
 BULLET_PREFIX_RE = re.compile(r"^(?:[-*•]+|\d+[.)])\s*")

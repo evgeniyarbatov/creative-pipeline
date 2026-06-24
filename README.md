@@ -6,10 +6,6 @@
 
 Extracts artist memory from raw transcripts using CrewAI + Ollama — not captions, not marketing copy. The goal is to preserve what you were thinking when you made a piece, including the parts that never resolved. See `ROADMAP.md` and `docs/philosophy.md` for the full direction.
 
-## Examples
-
-See `examples/drawing-of-clouds` and `examples/bamboo-forest` for a messy transcript next to its `memory.json`/`memory.md` extraction — contradictions, tangents, and hedging preserved.
-
 ## Quick Start
 
 1. Install and run Ollama.
