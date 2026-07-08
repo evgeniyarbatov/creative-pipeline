@@ -10,8 +10,7 @@ venv:
 	@python3.12 -m venv $(VENV_PATH)
 
 install: venv
-	@$(PIP) install --disable-pip-version-check -q --upgrade pip
-	@$(PIP) install --disable-pip-version-check -q -r $(REQUIREMENTS)
+	@uv pip install -q -r $(REQUIREMENTS)
 
 run-extract:
 	@$(PYTHON) scripts/extract_pipeline.py
