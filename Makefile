@@ -12,8 +12,7 @@ venv:
 install: venv
 	@uv pip install -q -r $(REQUIREMENTS)
 
-run-extract:
+run-extract: install
 	@$(PYTHON) scripts/extract_pipeline.py
-
-test:
+test: install
 	@$(PYTHON) -m pytest -q
