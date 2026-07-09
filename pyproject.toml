@@ -1,0 +1,18 @@
+[project]
+name = "creative-pipeline"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "crewai",
+    "langchain-community",
+    "langchain-ollama",
+    "pyyaml",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
+[tool.uv]
+package = false
