@@ -90,14 +90,14 @@ def render_memory_markdown(memory: dict[str, Any], artwork_name: str) -> str:
         a = contradiction.get("a", "")
         b = contradiction.get("b", "")
         context = contradiction.get("context", "")
-        lines.append(f"- \"{a}\" vs. \"{b}\"" + (f" — {context}" if context else ""))
+        lines.append(f'- "{a}" vs. "{b}"' + (f" — {context}" if context else ""))
     lines.append("")
 
     lines.append("## Tangents")
     for tangent in memory["tangents"]:
         quote = tangent.get("quote", "")
         relation = tangent.get("relation", "")
-        lines.append(f"- \"{quote}\"" + (f" — {relation}" if relation else ""))
+        lines.append(f'- "{quote}"' + (f" — {relation}" if relation else ""))
     lines.append("")
 
     lines.append("## Open Questions")
@@ -109,6 +109,6 @@ def render_memory_markdown(memory: dict[str, Any], artwork_name: str) -> str:
     for anchor in memory["anchors"]:
         quote = anchor.get("quote", "")
         why = anchor.get("why_it_matters", "")
-        lines.append(f"- \"{quote}\"" + (f" — {why}" if why else ""))
+        lines.append(f'- "{quote}"' + (f" — {why}" if why else ""))
 
     return "\n".join(lines).rstrip() + "\n"

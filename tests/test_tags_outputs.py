@@ -1,5 +1,4 @@
 import pytest
-
 from pipeline_utils import normalize_tags_output
 from task_config import TaskConfigError
 

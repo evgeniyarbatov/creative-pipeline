@@ -1,5 +1,4 @@
 import pytest
-
 from task_config import TaskConfigError, load_task_config
 
 

@@ -1,5 +1,4 @@
 import pytest
-
 from memory_schema import (
     MemorySchemaError,
     parse_memory_payload,

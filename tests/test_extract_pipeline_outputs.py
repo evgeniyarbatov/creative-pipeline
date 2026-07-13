@@ -1,7 +1,6 @@
 from types import SimpleNamespace
 
 import pytest
-
 from extract_pipeline import (
     base_output_paths,
     output_text_ready,

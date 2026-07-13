@@ -3,18 +3,18 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
-
-from crewai import Agent, Crew, Process, Task
+from typing import Any
 
 from agent_config import AgentConfigError, load_agent_config
-from task_config import TaskConfigError, load_task_config
+from crewai import Agent, Crew, Process, Task
 from memory_schema import MemorySchemaError, parse_memory_payload, render_memory_markdown
 from pipeline_utils import (
     derive_artwork_name,
     normalize_tags_output,
 )
+from task_config import TaskConfigError, load_task_config
 
 MEMORY_FILENAME = "memory.json"
 MEMORY_MD_FILENAME = "memory.md"
@@ -99,21 +99,15 @@ def persist_task_output(task: Task, output_path: Path, label: str) -> None:
     write_output_file(output_path, task.output.raw)
 
 
-def persist_memory_output(
-    task: Task, output_dir: Path, artwork_name: str
-) -> None:
+def persist_memory_output(task: Task, output_dir: Path, artwork_name: str) -> None:
     if task.output is None:
         raise TaskConfigError(f"Missing memory output: {memory_path(output_dir)}")
     try:
         memory = parse_memory_payload(task.output.raw)
     except MemorySchemaError as exc:
-        raise TaskConfigError(
-            f"Malformed memory output for {artwork_name}: {exc}"
-        ) from exc
+        raise TaskConfigError(f"Malformed memory output for {artwork_name}: {exc}") from exc
     write_output_file(memory_path(output_dir), memory)
-    write_output_file(
-        memory_md_path(output_dir), render_memory_markdown(memory, artwork_name)
-    )
+    write_output_file(memory_md_path(output_dir), render_memory_markdown(memory, artwork_name))
 
 
 def get_llm(model_name: str, base_url: str | None, options: dict[str, float | int]):
@@ -192,7 +186,6 @@ def build_tags_task(
         expected_output=tags_config["expected_output"],
         agent=agents["tags"],
     )
-
 
 
 def process_transcript(

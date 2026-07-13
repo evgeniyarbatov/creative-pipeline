@@ -1,5 +1,4 @@
 import pytest
-
 from agent_config import AgentConfigError, load_agent_config
 
 

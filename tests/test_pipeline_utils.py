@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from pipeline_utils import derive_artwork_name
 
 
