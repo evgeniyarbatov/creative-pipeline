@@ -11,7 +11,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=2.3.0",
     "pytest",
+    "types-pyyaml>=6.0.12.20260518",
 ]
 
 [tool.uv]
@@ -33,7 +35,7 @@ quote-style = "double"
 
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 strict = true
 warn_return_any = true
 warn_unused_ignores = true

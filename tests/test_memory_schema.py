@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from memory_schema import (
     MemorySchemaError,
@@ -28,30 +30,36 @@ VALID_PAYLOAD = """
 """
 
 
-def test_parse_memory_payload_valid():
+def test_parse_memory_payload_valid() -> None:
     memory = parse_memory_payload(VALID_PAYLOAD)
     assert memory["source"]["filename"] == "drawing-of-clouds.txt"
     assert len(memory["threads"]) == 1
 
 
-def test_parse_memory_payload_strips_markdown_fences():
+def test_parse_memory_payload_strips_markdown_fences() -> None:
     fenced = f"```json\n{VALID_PAYLOAD}\n```"
     memory = parse_memory_payload(fenced)
     assert memory["source"]["filename"] == "drawing-of-clouds.txt"
 
 
-def test_parse_memory_payload_invalid_json_raises():
+def test_parse_memory_payload_invalid_json_raises() -> None:
     with pytest.raises(MemorySchemaError):
         parse_memory_payload("not json at all")
 
 
-def test_validate_memory_schema_missing_key_raises():
-    data = {"source": {}, "threads": [], "contradictions": [], "tangents": [], "anchors": []}
+def test_validate_memory_schema_missing_key_raises() -> None:
+    data: dict[str, Any] = {
+        "source": {},
+        "threads": [],
+        "contradictions": [],
+        "tangents": [],
+        "anchors": [],
+    }
     with pytest.raises(MemorySchemaError):
         validate_memory_schema(data)
 
 
-def test_validate_memory_schema_wrong_type_raises():
+def test_validate_memory_schema_wrong_type_raises() -> None:
     data = {
         "source": {},
         "threads": "not a list",
@@ -64,7 +72,7 @@ def test_validate_memory_schema_wrong_type_raises():
         validate_memory_schema(data)
 
 
-def test_render_memory_markdown_includes_sections():
+def test_render_memory_markdown_includes_sections() -> None:
     memory = parse_memory_payload(VALID_PAYLOAD)
     rendered = render_memory_markdown(memory, "drawing-of-clouds")
 

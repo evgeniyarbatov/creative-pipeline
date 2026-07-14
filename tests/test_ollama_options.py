@@ -1,10 +1,12 @@
 import sys
 import types
+from typing import Any
 
+import pytest
 from extract_pipeline import derivation_options, extraction_options, get_llm
 
 
-def test_extraction_options_defaults():
+def test_extraction_options_defaults() -> None:
     assert extraction_options() == {
         "temperature": 0.7,
         "top_p": 0.9,
@@ -13,7 +15,7 @@ def test_extraction_options_defaults():
     }
 
 
-def test_derivation_options_defaults():
+def test_derivation_options_defaults() -> None:
     assert derivation_options() == {
         "temperature": 0.4,
         "top_p": 0.85,
@@ -22,15 +24,15 @@ def test_derivation_options_defaults():
     }
 
 
-def test_get_llm_passes_options_to_crewai_llm(monkeypatch):
-    captured = {}
+def test_get_llm_passes_options_to_crewai_llm(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, Any] = {}
 
     class FakeLLM:
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs: Any) -> None:
             captured.update(kwargs)
 
     fake_module = types.ModuleType("crewai")
-    fake_module.LLM = FakeLLM
+    setattr(fake_module, "LLM", FakeLLM)  # noqa: B010
     monkeypatch.setitem(sys.modules, "crewai", fake_module)
 
     get_llm("llama3:latest", None, extraction_options())

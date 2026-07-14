@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import pytest
 from task_config import TaskConfigError, load_task_config
 
 
-def test_load_task_config_defaults(tmp_path):
+def test_load_task_config_defaults(tmp_path: Path) -> None:
     config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
@@ -23,7 +25,7 @@ task:
     assert config["expected_output"] == "Result"
 
 
-def test_load_task_config_unknown_key(tmp_path):
+def test_load_task_config_unknown_key(tmp_path: Path) -> None:
     config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
@@ -43,7 +45,7 @@ task:
         load_task_config(config_file)
 
 
-def test_load_task_config_missing_required(tmp_path):
+def test_load_task_config_missing_required(tmp_path: Path) -> None:
     config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """
@@ -61,7 +63,7 @@ task:
         load_task_config(config_file)
 
 
-def test_load_task_config_missing_section(tmp_path):
+def test_load_task_config_missing_section(tmp_path: Path) -> None:
     config_file = tmp_path / "transcript.yaml"
     config_file.write_text(
         """

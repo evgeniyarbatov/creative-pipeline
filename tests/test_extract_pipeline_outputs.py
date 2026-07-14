@@ -1,3 +1,4 @@
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -12,7 +13,7 @@ from extract_pipeline import (
 from task_config import TaskConfigError
 
 
-def test_write_output_file_string(tmp_path):
+def test_write_output_file_string(tmp_path: Path) -> None:
     output_path = tmp_path / "output.txt"
 
     write_output_file(output_path, "hello")
@@ -20,7 +21,7 @@ def test_write_output_file_string(tmp_path):
     assert output_path.read_text(encoding="utf-8") == "hello"
 
 
-def test_write_output_file_dict(tmp_path):
+def test_write_output_file_dict(tmp_path: Path) -> None:
     output_path = tmp_path / "output.json"
 
     write_output_file(output_path, {"a": 1})
@@ -28,7 +29,7 @@ def test_write_output_file_dict(tmp_path):
     assert output_path.read_text(encoding="utf-8") == '{\n  "a": 1\n}'
 
 
-def test_persist_task_output_missing_output(tmp_path):
+def test_persist_task_output_missing_output(tmp_path: Path) -> None:
     output_path = tmp_path / "output.txt"
     task = SimpleNamespace(output=None)
 
@@ -36,7 +37,7 @@ def test_persist_task_output_missing_output(tmp_path):
         persist_task_output(task, output_path, "missing")
 
 
-def test_persist_task_output_writes_raw(tmp_path):
+def test_persist_task_output_writes_raw(tmp_path: Path) -> None:
     output_path = tmp_path / "output.txt"
     task = SimpleNamespace(output=SimpleNamespace(raw="payload"))
 
@@ -45,13 +46,13 @@ def test_persist_task_output_writes_raw(tmp_path):
     assert output_path.read_text(encoding="utf-8") == "payload"
 
 
-def test_output_text_ready_false_for_missing_file(tmp_path):
+def test_output_text_ready_false_for_missing_file(tmp_path: Path) -> None:
     output_path = tmp_path / "missing.txt"
 
     assert output_text_ready(output_path) is False
 
 
-def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
+def test_outputs_complete_true_when_all_base_outputs_present(tmp_path: Path) -> None:
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
     (output_dir / "memory.json").write_text("{}", encoding="utf-8")
@@ -61,7 +62,7 @@ def test_outputs_complete_true_when_all_base_outputs_present(tmp_path):
     assert outputs_complete(base_output_paths(output_dir)) is True
 
 
-def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
+def test_outputs_complete_false_when_any_base_output_missing(tmp_path: Path) -> None:
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
     (output_dir / "memory.json").write_text("{}", encoding="utf-8")
@@ -70,7 +71,7 @@ def test_outputs_complete_false_when_any_base_output_missing(tmp_path):
     assert outputs_complete(base_output_paths(output_dir)) is False
 
 
-def test_persist_memory_output_writes_json_and_markdown(tmp_path):
+def test_persist_memory_output_writes_json_and_markdown(tmp_path: Path) -> None:
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
     raw = (
@@ -86,7 +87,7 @@ def test_persist_memory_output_writes_json_and_markdown(tmp_path):
     assert (output_dir / "memory.md").read_text(encoding="utf-8").startswith("# artwork")
 
 
-def test_persist_memory_output_raises_on_malformed_payload(tmp_path):
+def test_persist_memory_output_raises_on_malformed_payload(tmp_path: Path) -> None:
     output_dir = tmp_path / "artwork"
     output_dir.mkdir()
     task = SimpleNamespace(output=SimpleNamespace(raw="not json"))

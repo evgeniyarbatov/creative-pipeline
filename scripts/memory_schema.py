@@ -59,7 +59,7 @@ def validate_memory_schema(data: Any) -> None:
 def parse_memory_payload(raw: str) -> dict[str, Any]:
     payload = extract_json_payload(raw)
     try:
-        data = json.loads(payload)
+        data: dict[str, Any] = json.loads(payload)
     except json.JSONDecodeError as exc:
         raise MemorySchemaError(f"Memory payload is not valid JSON: {exc}") from exc
     validate_memory_schema(data)

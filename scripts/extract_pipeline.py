@@ -5,7 +5,7 @@ import json
 import os
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from agent_config import AgentConfigError, load_agent_config
 from crewai import Agent, Crew, Process, Task
@@ -15,6 +15,17 @@ from pipeline_utils import (
     normalize_tags_output,
 )
 from task_config import TaskConfigError, load_task_config
+
+
+class _TaskOutputLike(Protocol):
+    @property
+    def raw(self) -> str: ...
+
+
+class _TaskLike(Protocol):
+    @property
+    def output(self) -> _TaskOutputLike | None: ...
+
 
 MEMORY_FILENAME = "memory.json"
 MEMORY_MD_FILENAME = "memory.md"
@@ -93,13 +104,13 @@ def write_output_file(path: Path, content: Any) -> None:
     path.write_text(payload, encoding="utf-8")
 
 
-def persist_task_output(task: Task, output_path: Path, label: str) -> None:
+def persist_task_output(task: _TaskLike, output_path: Path, label: str) -> None:
     if task.output is None:
         raise TaskConfigError(f"Missing {label} output: {output_path}")
     write_output_file(output_path, task.output.raw)
 
 
-def persist_memory_output(task: Task, output_dir: Path, artwork_name: str) -> None:
+def persist_memory_output(task: _TaskLike, output_dir: Path, artwork_name: str) -> None:
     if task.output is None:
         raise TaskConfigError(f"Missing memory output: {memory_path(output_dir)}")
     try:
@@ -110,11 +121,11 @@ def persist_memory_output(task: Task, output_dir: Path, artwork_name: str) -> No
     write_output_file(memory_md_path(output_dir), render_memory_markdown(memory, artwork_name))
 
 
-def get_llm(model_name: str, base_url: str | None, options: dict[str, float | int]):
+def get_llm(model_name: str, base_url: str | None, options: dict[str, float | int]) -> Any:
     try:
         from crewai import LLM
 
-        kwargs = {"extra_body": {"options": options}}
+        kwargs: dict[str, Any] = {"extra_body": {"options": options}}
         if base_url:
             kwargs["base_url"] = base_url
         return LLM(model=f"ollama/{model_name}", **kwargs)
@@ -122,7 +133,7 @@ def get_llm(model_name: str, base_url: str | None, options: dict[str, float | in
         try:
             from langchain_community.llms import Ollama
         except Exception:  # pragma: no cover - fallback when community package missing
-            from langchain_ollama import Ollama
+            from langchain_ollama import OllamaLLM as Ollama
 
         kwargs = {"options": options}
         if base_url:
@@ -131,11 +142,11 @@ def get_llm(model_name: str, base_url: str | None, options: dict[str, float | in
 
 
 def build_agents(
-    extraction_llm,
-    derivation_llm,
+    extraction_llm: Any,
+    derivation_llm: Any,
     config_dir: Path,
 ) -> dict[str, Agent]:
-    def build_agent(name: str, llm) -> Agent:
+    def build_agent(name: str, llm: Any) -> Agent:
         config = load_agent_config(config_dir / f"{name}.yaml")
         return Agent(**config, llm=llm)
 
@@ -191,8 +202,8 @@ def build_tags_task(
 def process_transcript(
     transcript_path: Path,
     output_root: Path,
-    extraction_llm,
-    derivation_llm,
+    extraction_llm: Any,
+    derivation_llm: Any,
     config_dir: Path,
     task_configs: dict[str, dict[str, str]],
 ) -> None:
