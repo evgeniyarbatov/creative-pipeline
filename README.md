@@ -25,7 +25,7 @@ make install
 5. Run the pipeline:
 
 ```bash
-make
+make run
 ```
 
 ## Docs
