@@ -12,6 +12,27 @@ Inputs are transcripts the artist recorded about their own work: spoken, messy, 
 
 ---
 
+## Why keep going
+
+Almost every AI writing tool exists to smooth things over — resolve the contradiction, cut the tangent, ship the clean sentence. This repo does the opposite on purpose: it exists to catch you, months later, mid-thought, including the parts you never resolved. That's a genuinely rare thing to build deliberately, and the two commits already shipped (`5dd7b77`, `b713677`) prove the rewrite from caption-generator to memory-keeper actually happened, not just got planned.
+
+## What it opens up
+
+Once fidelity is testable (Phase 4 — quote overlap, contradiction preservation), the question stops being "did this capture what I said" and becomes "what patterns show up across dozens of pieces over years" — recurring tensions, recurring words, the same unresolved question showing up in transcripts a year apart. That's only answerable once enough memory.json files exist to compare, and only trustworthy once fidelity is provably not being sanded down.
+
+## Capability this builds
+
+Resisting the urge to make your own past thinking sound more coherent than it was — a discipline that matters far beyond captioning artwork, anywhere you're tempted to retroactively clean up a messier truth.
+
+## Connects to
+
+- **[private]** — explicitly reuses Ollama tuning settings from a commit in this repo already; the fidelity-vs-fluency tension this repo is solving for creative transcripts is the same tension [private] needs solved for job-match writing, just with different stakes.
+- **[private]** — same underlying goal from the visual side: both projects exist to preserve a personal creative signal (spoken memory here, hand-drawn style there) without letting a model smooth it into something generic.
+- **[private]** — same raw material (phone-recorded voice) and the same temptation to over-clean transcription; worth checking whether this repo's anti-polish heuristics (Phase 4a) transfer directly.
+- **[private]** — same instinct pointed at a different medium: using personal material (photos there, transcripts here) to surface state of mind rather than produce something presentable.
+
+---
+
 ## Principles (non-negotiable)
 
 1. **Preserve voice.** Favor the artist's phrasing over paraphrase. When in doubt, quote or stay close to the spoken line.
