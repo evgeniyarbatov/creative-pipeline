@@ -6,12 +6,6 @@
 
 Extracts artist memory from raw transcripts using CrewAI + Ollama — not captions, not marketing copy. The goal is to preserve what you were thinking when you made a piece, including the parts that never resolved. See `ROADMAP.md` and `docs/philosophy.md` for the full direction.
 
-## Status
-
-| Folder | Status | Last touched | Next step |
-|---|---|---|---|
-| root | active | 2026-10-06 | Rewrite README.md and docs/getting-started.md around artist memory, not caption generation |
-
 ## Quick Start
 
 1. Install and run Ollama.
