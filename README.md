@@ -18,7 +18,7 @@ ollama pull gemma3:latest
 3. Install dependencies:
 
 ```bash
-make install
+make setup
 ```
 
 4. Add a transcript `.txt` file.
